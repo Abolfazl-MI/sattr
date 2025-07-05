@@ -4,11 +4,22 @@ import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CacheModule } from '@nestjs/cache-manager';
+import { UserModule } from './user/user.module';
+import { AuthModule } from './auth/auth.module';
+import { JwtModule } from '@nestjs/jwt';
+
+import * as process from 'node:process';
+import { createKeyv, Keyv } from '@keyv/redis';
+import { CacheableMemory } from 'cacheable';
+import { RedisOptions } from './common/utills/redis.config';
+import { UserEntity } from './user/entity/user.entity';
+import { ListenTimeEntity } from './user/entity/listenTime.entity';
+import { UserMetaEntity } from './user/entity/userMeta.entity';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
-    CacheModule.register(),
+    CacheModule.registerAsync(RedisOptions),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DB_HOST,
@@ -16,9 +27,15 @@ import { CacheModule } from '@nestjs/cache-manager';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
-      entities: [],
+      entities: [UserEntity, ListenTimeEntity, UserMetaEntity],
       synchronize: true,
     }),
+
+    JwtModule.register({
+      secret: process.env.JWT_SECRET,
+    }),
+    UserModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
