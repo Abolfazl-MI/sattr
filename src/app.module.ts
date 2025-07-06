@@ -18,6 +18,8 @@ import { BookModule } from './book/book.module';
 import { CategoryEntity } from './book/entities/category.entitiy';
 import { BookEntity } from './book/entities/book.entity';
 import { EpisodeEntity } from './book/entities/episode.entity';
+import { TransactionModule } from './transaction/transaction.module';
+import { TransactionEntity } from './transaction/entities/transaction';
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -36,12 +38,14 @@ import { EpisodeEntity } from './book/entities/episode.entity';
         BookEntity,
         CategoryEntity,
         EpisodeEntity,
+        TransactionEntity
       ],
       synchronize: true,
     }),
     UserModule,
     AuthModule,
     BookModule,
+    TransactionModule,
   ],
   controllers: [AppController],
   providers: [AppService],
