@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { EpisodeEntity } from './entities/episode.entity';
 import { BookService } from './services/book.service';
 import { BookDataAccess } from './services/book.data-access.service';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
   imports:[TypeOrmModule.forFeature([BookEntity , CategoryEntity , EpisodeEntity])],

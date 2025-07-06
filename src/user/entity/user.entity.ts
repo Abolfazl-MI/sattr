@@ -19,12 +19,16 @@ export enum UserRole {
 export class UserEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
-  @Column()
+
+  @Column({nullable:true})
   name: string;
+  
   @Column({ nullable: false })
   phone: string;
-  @Column()
+
+  @Column({nullable:true})
   email: string;
+
   @Column({ default: true })
   isActive: boolean;
 
@@ -34,10 +38,13 @@ export class UserEntity {
   @OneToOne(() => ListenTimeEntity, { onDelete: 'CASCADE' })
   @JoinColumn()
   listenTime: ListenTimeEntity;
+
   @OneToOne(() => UserMetaEntity, { onDelete: 'CASCADE' })
   userMeta: UserMetaEntity;
+
   @CreateDateColumn()
   createdAt: Date;
+
   @UpdateDateColumn()
   updatedAt: Date;
 }
