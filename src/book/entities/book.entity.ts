@@ -12,8 +12,8 @@ import { EpisodeEntity } from './episode.entity';
 
 @Entity('book')
 export class BookEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column({ type: 'varchar' })
   name: string;
