@@ -14,12 +14,12 @@ export class UserService {
   async registerUser(data: RegisterUserRequestDto): Promise<UserEntity> {
     let user: UserEntity | null = await this.repository.findOne({
       where: {
-        ...data,
+        phone:data.phone
       },
     });
     if (!user) {
       user = await this.repository.save({
-        ...data,
+        phone:data.phone
       });
       return user;
     } else {

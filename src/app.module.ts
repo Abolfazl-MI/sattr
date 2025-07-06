@@ -6,7 +6,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { CacheModule } from '@nestjs/cache-manager';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
-import { JwtModule } from '@nestjs/jwt';
 
 import * as process from 'node:process';
 import { createKeyv, Keyv } from '@keyv/redis';
@@ -21,7 +20,6 @@ import { BookEntity } from './book/entities/book.entity';
 import { EpisodeEntity } from './book/entities/episode.entity';
 @Module({
   imports: [
-    BookModule,
     ConfigModule.forRoot(),
     CacheModule.registerAsync(RedisOptions),
     TypeOrmModule.forRoot({
@@ -31,17 +29,21 @@ import { EpisodeEntity } from './book/entities/episode.entity';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
-      entities: [UserEntity, ListenTimeEntity, UserMetaEntity,BookEntity , CategoryEntity , EpisodeEntity],
+      entities: [
+        UserEntity,
+        ListenTimeEntity,
+        UserMetaEntity,
+        BookEntity,
+        CategoryEntity,
+        EpisodeEntity,
+      ],
       synchronize: true,
-    }),
-
-    JwtModule.register({
-      secret: process.env.JWT_SECRET,
     }),
     UserModule,
     AuthModule,
+    BookModule,
   ],
   controllers: [AppController],
-  providers: [AppService ],
+  providers: [AppService],
 })
 export class AppModule {}
