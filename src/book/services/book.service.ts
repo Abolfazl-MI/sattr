@@ -29,4 +29,19 @@ export class BookService {
 
     return episode;
   }
+
+  async searchBooks(bookName: string) {
+    return this.dataAccess.searchBooks(bookName);
+  }
+
+  async categoriesBook(id: number) {
+    const result = await this.dataAccess.findOneCategory({
+      where: { id, isActive: true },
+      relations: { books: true },
+    });
+
+    if (!result) throw new NotFoundException('Category not found!');
+
+    return result
+  }
 }

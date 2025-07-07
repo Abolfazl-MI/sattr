@@ -1,16 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindOneOptions, Like, Repository } from 'typeorm';
 import { EpisodeEntity } from '../entities/episode.entity';
 import { BookEntity } from '../entities/book.entity';
+import { CategoryEntity } from '../entities/category.entitiy';
 
 @Injectable()
 export class BookDataAccess {
   constructor(
     @InjectRepository(BookEntity)
     private bookRepository: Repository<BookEntity>,
+
     @InjectRepository(EpisodeEntity)
     private episodeRepository: Repository<EpisodeEntity>,
+
+    @InjectRepository(CategoryEntity)
+    private categoryRepository: Repository<CategoryEntity>,
   ) {}
 
   findOneById(id: string) {
@@ -27,5 +32,15 @@ export class BookDataAccess {
 
   findOneEpisode(id: string) {
     return this.episodeRepository.findOne({ where: { id } });
+  }
+
+  searchBooks(bookName: string) {
+    return this.bookRepository.find({
+      where: { name: Like(`%${bookName}%`) },
+    });
+  }
+
+  findOneCategory(options: FindOneOptions<CategoryEntity>) {
+    return this.categoryRepository.findOne(options);
   }
 }
