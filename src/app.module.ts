@@ -20,19 +20,12 @@ import { BookEntity } from './book/entities/book.entity';
 import { EpisodeEntity } from './book/entities/episode.entity';
 import { TransactionModule } from './transaction/transaction.module';
 import { TransactionEntity } from './transaction/entities/transaction';
-import { BullModule } from '@nestjs/bullmq';
 import { PlanModule } from './plan/plan.module';
 import { PlanEntity } from './plan/entity/plan.entity';
 import { CouponModule } from './coupon/coupon.module';
 import { CouponEntity } from './coupon/entities/coupon.entity';
 @Module({
   imports: [
-    BullModule.forRoot({
-      connection: {
-        host: '127.0.0.1',
-        port: 6379,
-      },
-    }),
     ConfigModule.forRoot(),
     CacheModule.registerAsync(RedisOptions),
     TypeOrmModule.forRoot({

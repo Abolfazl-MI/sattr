@@ -21,7 +21,6 @@
   },
   "dependencies": {
     "@keyv/redis": "^4.5.0",
-    "@nestjs/bullmq": "^11.0.2",
     "@nestjs/cache-manager": "^3.0.1",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.2",
@@ -31,7 +30,6 @@
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/typeorm": "^11.0.0",
     "bcrypt": "^6.0.0",
-    "bullmq": "^5.56.1",
     "cache-manager": "^7.0.1",
     "cache-manager-redis-store": "^3.0.1",
     "cacheable": "^1.10.1",
