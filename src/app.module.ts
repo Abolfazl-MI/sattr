@@ -23,6 +23,8 @@ import { TransactionEntity } from './transaction/entities/transaction';
 import { BullModule } from '@nestjs/bullmq';
 import { PlanModule } from './plan/plan.module';
 import { PlanEntity } from './plan/entity/plan.entity';
+import { CouponModule } from './coupon/coupon.module';
+import { CouponEntity } from './coupon/entities/coupon.entity';
 @Module({
   imports: [
     BullModule.forRoot({
@@ -48,7 +50,8 @@ import { PlanEntity } from './plan/entity/plan.entity';
         CategoryEntity,
         EpisodeEntity,
         TransactionEntity,
-        PlanEntity
+        PlanEntity,
+        CouponEntity,
       ],
       synchronize: true,
     }),
@@ -57,6 +60,7 @@ import { PlanEntity } from './plan/entity/plan.entity';
     BookModule,
     TransactionModule,
     PlanModule,
+    CouponModule,
   ],
   controllers: [AppController],
   providers: [AppService],
