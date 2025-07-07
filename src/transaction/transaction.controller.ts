@@ -7,19 +7,8 @@ export class TransactionController {
   constructor(private readonly transactionService: TransactionService) {}
 
   // @UseGuards(JwtAuthGuard)
-  @Post(':id/buy-product')
-  async buyProduct(@Req() req, @Param('id') productId: number) {
-    const response = await this.transactionService.addTransactionToQueue(
-      {
-        // userId: req.user.id,
-        productId,
-      },
-      'buy-product',
-    );
+  @Post('buy-book/api')
+  async buyProduct(@Param('id') bookId: number) {
 
-    if (response.status !== 200)
-      throw new HttpException(response.message, response.status);
-
-    return response;
   }
 }
