@@ -7,7 +7,11 @@ async function bootstrap() {
 
   app.setGlobalPrefix('/api/v1');
 
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+  app.useGlobalPipes(new ValidationPipe({
+    whitelist: true,      // optional: strips unknown fields
+    forbidNonWhitelisted: false,
+    transform: true,
+  }));
 
   await app.listen(process.env.PORT ?? 3000);
 }
