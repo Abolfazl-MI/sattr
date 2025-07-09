@@ -5,6 +5,7 @@ import { UserEntity } from '../entity/user.entity';
 import { Repository } from 'typeorm';
 import { UserDataAcess } from './user.dataAcess.service';
 import { SingleIdValidator } from 'src/common/dtos/single-id-validator';
+import { UpdateProfileRequestDto } from '../dtos/update.profile.dto';
 
 @Injectable()
 export class UserService {
@@ -22,5 +23,8 @@ export class UserService {
 
   async getUserProfile(id: SingleIdValidator) {
     return this.userDataAcess.getUserProfile(id)
+  }
+  async updateUserProfie(id: SingleIdValidator, request: UpdateProfileRequestDto) {
+    return this.userDataAcess.updateProfile(id.id, request)
   }
 }

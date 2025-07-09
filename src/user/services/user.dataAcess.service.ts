@@ -1,10 +1,11 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from "@nestjs/common";
 import { UserEntity } from "../entity/user.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { BookDataAccess } from "src/book/services/book.data-access.service";
 import { Repository } from "typeorm";
 import { RegisterUserRequestDto } from "src/common/dto/registerUserRequestDto";
 import { SingleIdValidator } from "src/common/dtos/single-id-validator";
+import { UpdateProfileRequestDto } from "../dtos/update.profile.dto";
 
 @Injectable()
 export class UserDataAcess {
@@ -58,5 +59,17 @@ export class UserDataAcess {
             throw new NotFoundException('User not found')
         }
         return profile;
+    }
+    async updateProfile(id: string, request: UpdateProfileRequestDto) {
+        const result = await this.repository.update({ id }, {
+            ...request,
+        })
+        if (result.affected && result.affected > 0) {
+            return {
+                message: 'profile updated'
+            }
+        } else if (result.affected === 0) {
+            throw new InternalServerErrorException()
+        }
     }
 }
