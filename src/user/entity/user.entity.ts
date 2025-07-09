@@ -20,14 +20,17 @@ export class UserEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({nullable:true})
-  name: string;
-  
+  @Column({ nullable: true })
+  name?: string;
+
   @Column({ nullable: false })
   phone: string;
 
-  @Column({nullable:true})
-  email: string;
+  @Column({ nullable: true })
+  email?: string;
+
+  @Column({ nullable: true })
+  profilePicture: string;
 
   @Column({ default: true })
   isActive: boolean;
@@ -47,4 +50,5 @@ export class UserEntity {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
 }
