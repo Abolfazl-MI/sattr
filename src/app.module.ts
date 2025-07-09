@@ -22,8 +22,14 @@ import { PlanModule } from './plan/plan.module';
 import { PlanEntity } from './plan/entity/plan.entity';
 import { FeedModule } from './feed/feed.module';
 import { SectionEntity } from './feed/entities/section.entity';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'node:path';
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(process.cwd(), 'public'),
+      serveRoot: '/public', // or just '/' if you want
+    }),
     ConfigModule.forRoot(),
     CacheModule.registerAsync(RedisOptions),
     TypeOrmModule.forRoot({
@@ -43,7 +49,7 @@ import { SectionEntity } from './feed/entities/section.entity';
         PlanEntity,
         SectionEntity
       ],
-      logging:true,
+      logging: true,
       synchronize: true,
     }),
     UserModule,
