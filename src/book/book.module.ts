@@ -12,5 +12,6 @@ import { AuthModule } from 'src/auth/auth.module';
   imports:[TypeOrmModule.forFeature([BookEntity , CategoryEntity , EpisodeEntity])],
   controllers: [BookController],
   providers: [BookService , BookDataAccess],
+  exports:[BookDataAccess]
 })
 export class BookModule {}

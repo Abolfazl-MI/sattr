@@ -2,6 +2,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -9,6 +10,7 @@ import {
 } from 'typeorm';
 import { CategoryEntity } from './category.entitiy';
 import { EpisodeEntity } from './episode.entity';
+import { SectionEntity } from 'src/feed/entities/section.entity';
 
 @Entity('book')
 export class BookEntity {
@@ -58,4 +60,7 @@ export class BookEntity {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @ManyToMany(() => SectionEntity, section => section.books)
+  sections: SectionEntity[];
 }
