@@ -70,7 +70,7 @@ export class FeedDataAcess {
     }
 
     async get(request: SingleIdValidator, listRequest: ListRequestDto): Promise<{
-        data: SectionEntity,
+        data: SectionFeedResponse,
         booksCount: number
     }> {
         const { skip, take } = listRequest
@@ -90,12 +90,28 @@ export class FeedDataAcess {
             })
             .leftJoinAndSelect('book.category', 'category')
             .where('book.isActive = :active', { active: true })
+            .select([
+                'book.id',
+                'book.name',
+                'book.createdAt',
+                'book.thumbnail',
+                'book.author',
+                'book.translator',
+                'book.isIndividual',
+                'category.id',
+                'category.title',
+            ])
             .skip(skip)
             .take(take)
             .getManyAndCount();
         section.books = books;
+        const data: SectionFeedResponse = {
+            ...section,
+            books
+
+        }
         return {
-            data: { ...section },
+            data,
             booksCount: total
         }
     }
