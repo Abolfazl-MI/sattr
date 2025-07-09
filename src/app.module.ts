@@ -20,6 +20,8 @@ import { BookEntity } from './book/entities/book.entity';
 import { EpisodeEntity } from './book/entities/episode.entity';
 import { PlanModule } from './plan/plan.module';
 import { PlanEntity } from './plan/entity/plan.entity';
+import { FeedModule } from './feed/feed.module';
+import { SectionEntity } from './feed/entities/section.entity';
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -38,7 +40,8 @@ import { PlanEntity } from './plan/entity/plan.entity';
         BookEntity,
         CategoryEntity,
         EpisodeEntity,
-        PlanEntity
+        PlanEntity,
+        SectionEntity
       ],
       synchronize: true,
     }),
@@ -46,6 +49,7 @@ import { PlanEntity } from './plan/entity/plan.entity';
     AuthModule,
     BookModule,
     PlanModule,
+    FeedModule,
   ],
   controllers: [AppController],
   providers: [AppService],
