@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { FeedService } from './feed.service';
+import { FeedService } from './services/feed.service';
 import { FeedController } from './feed.controller';
 import { FeedDataAcess } from './services/feed.dataAcess.service';
 import { TypeOrmModule } from '@nestjs/typeorm';

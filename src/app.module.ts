@@ -43,6 +43,7 @@ import { SectionEntity } from './feed/entities/section.entity';
         PlanEntity,
         SectionEntity
       ],
+      logging:true,
       synchronize: true,
     }),
     UserModule,
@@ -54,4 +55,4 @@ import { SectionEntity } from './feed/entities/section.entity';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }

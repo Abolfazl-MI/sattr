@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { FeedDataAcess } from './services/feed.dataAcess.service';
+import { FeedDataAcess } from './feed.dataAcess.service';
 import { ListRequestDto } from 'src/common/dtos/listRequestDto.dto';
 import { SingleIdValidator } from 'src/common/dtos/single-id-validator';
 

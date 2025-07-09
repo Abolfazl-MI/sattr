@@ -1,5 +1,5 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
-import { FeedService } from './feed.service';
+import { FeedService } from './services/feed.service';
 import { ListRequestDto } from 'src/common/dtos/listRequestDto.dto';
 import { SingleIdValidator } from 'src/common/dtos/single-id-validator';
 
