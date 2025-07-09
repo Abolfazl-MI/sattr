@@ -1,8 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entity/user.entity';
-import { Repository } from 'typeorm';
+import {
+  FindManyOptions,
+  FindOneOptions,
+  FindOptionsWhere,
+  Repository,
+} from 'typeorm';
 import { UserMetaEntity } from './entity/userMeta.entity';
+import { BookEntity } from 'src/book/entities/book.entity';
 
 @Injectable()
 export class UserDataAccess {
@@ -14,11 +20,12 @@ export class UserDataAccess {
     private userMetaRepository: Repository<UserMetaEntity>,
   ) {}
 
-  findUserMeta(id: string) {
-    return this.userMetaRepository.findOne({
-      where: { user: { id } },
-      relations: { books: true },
-    });
+  findUserMeta(options: FindOneOptions<UserMetaEntity>) {
+    return this.userMetaRepository.findOne(options);
+  }
+
+  exists(options: FindManyOptions<UserMetaEntity>) {
+    return this.userMetaRepository.exists(options);
   }
 
   updateUserMeta(userMeta: Partial<UserMetaEntity>) {

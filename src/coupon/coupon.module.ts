@@ -9,6 +9,6 @@ import { CouponDataAccessService } from './services/coupon.data-access.service';
   imports: [TypeOrmModule.forFeature([CouponEntity])],
   controllers: [CouponController],
   providers: [CouponService, CouponDataAccessService],
-  exports: [CouponDataAccessService],
+  exports: [CouponService],
 })
 export class CouponModule {}

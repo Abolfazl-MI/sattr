@@ -22,8 +22,12 @@ export class UserMetaEntity {
   books: BookEntity[];
 
   // todo plan need plan
-  @Column()
-  activationDate: Date;
+
+  @Column({ type: 'timestamp', nullable: true })
+  subscriptionStartedAt: Date;
+
+  @Column({ type: 'timestamp', nullable: true })
+  subscriptionExpiresAt: Date;
 
   @CreateDateColumn()
   createdAt: Date;

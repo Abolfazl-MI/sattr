@@ -14,6 +14,7 @@ export class CouponDataAccessService {
       code,
       isActive: true,
       expiresAt: MoreThan(new Date()),
+      capacity: MoreThan(0),
     });
   }
 }

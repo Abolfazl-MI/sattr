@@ -26,8 +26,11 @@ export class TransactionEntity {
   @Column({ type: 'varchar' })
   token: string;
 
-  @Column({ type: 'int' , default:0 })
+  @Column({ type: 'int', default: 0 })
   discount: number;
+
+  @Column({ nullable: true })
+  couponId: number;
 
   @Column({ type: 'enum', enum: PurchaseType })
   purchaseType: PurchaseType;
