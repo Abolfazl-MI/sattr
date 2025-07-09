@@ -10,7 +10,7 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { Inject } from '@nestjs/common';
 import { JwtTokenService } from './jwt.service';
-import { UserService } from '../user/user.service';
+import { UserService } from '../user/services/user.service';
 import { RegisterUserRequestDto } from '../common/dto/registerUserRequestDto';
 
 import { generateOtpCode } from '../common/utills/otp.gen';

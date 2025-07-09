@@ -8,7 +8,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from '../user/entity/user.entity';
 import { ListenTimeEntity } from '../user/entity/listenTime.entity';
 import { UserMetaEntity } from '../user/entity/userMeta.entity';
-import { UserService } from '../user/user.service';
+import { UserService } from '../user/services/user.service';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 
 @Module({
