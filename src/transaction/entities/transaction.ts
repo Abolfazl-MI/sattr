@@ -1,9 +1,18 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { Status } from '../enums/status.enum';
 import { BookEntity } from 'src/book/entities/book.entity';
 import { PurchaseType } from '../enums/purchase-type.enum';
+import { PlanEntity } from 'src/plan/entity/plan.entity';
+import { UserEntity } from 'src/user/entity/user.entity';
 
-@Entity()
+@Entity('transaction')
 export class TransactionEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -17,7 +26,8 @@ export class TransactionEntity {
   @Column({ type: 'varchar' })
   token: string;
 
-  // coupon
+  @Column({ type: 'int' , default:0 })
+  discount: number;
 
   @Column({ type: 'enum', enum: PurchaseType })
   purchaseType: PurchaseType;
@@ -25,5 +35,15 @@ export class TransactionEntity {
   @ManyToOne(() => BookEntity, { nullable: true })
   book: BookEntity;
 
-  //   plan:
+  @ManyToOne(() => PlanEntity, { nullable: true })
+  plan: PlanEntity;
+
+  @ManyToOne(() => UserEntity)
+  user: UserEntity;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 }

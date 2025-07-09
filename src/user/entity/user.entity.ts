@@ -20,13 +20,13 @@ export class UserEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({nullable:true})
+  @Column({ nullable: true })
   name: string;
-  
+
   @Column({ nullable: false })
   phone: string;
 
-  @Column({nullable:true})
+  @Column({ nullable: true })
   email: string;
 
   @Column({ default: true })
@@ -39,7 +39,8 @@ export class UserEntity {
   @JoinColumn()
   listenTime: ListenTimeEntity;
 
-  @OneToOne(() => UserMetaEntity, { onDelete: 'CASCADE' })
+  @OneToOne(() => UserMetaEntity, (meta) => meta.user, { onDelete: 'CASCADE' })
+  @JoinColumn()
   userMeta: UserMetaEntity;
 
   @CreateDateColumn()

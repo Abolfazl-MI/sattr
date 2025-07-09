@@ -25,7 +25,7 @@ export class CouponEntity {
   value: number;
 
   //? TODO Make nullable by migration
-  @Column({ type: 'timestamptz' })
+  @Column({ type: 'timestamptz', nullable: true })
   expiresAt: Date;
 
   @Column({ type: 'int', nullable: true })
