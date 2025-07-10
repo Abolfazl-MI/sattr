@@ -29,4 +29,13 @@ export class CouponService {
       coupon,
     };
   }
+
+  async decreaseCouponCapacity(id: number) {
+    const coupon = await this.couponDataAccessService.findById(id);
+    if (!coupon) return;
+
+    coupon.capacity--;
+
+    await this.couponDataAccessService.update(coupon);
+  }
 }

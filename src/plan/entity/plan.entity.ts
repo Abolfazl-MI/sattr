@@ -1,29 +1,37 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity('plan')
 export class PlanEntity {
-    @PrimaryGeneratedColumn('uuid')
-    id: string
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-    @Column()
-    name: string
+  @Column()
+  name: string;
 
-    @Column()
-    amount: number
+  @Column()
+  amount: number;
 
-    @Column()
-    amountOff: number
+  @Column()
+  amountOff: number;
 
-    @Column()
-    index: number
+  @Column()
+  index: number;
 
-    @Column({ default: true, type: 'boolean' })
-    isActive:boolean
+  @Column({ default: true, type: 'boolean' })
+  isActive: boolean;
 
-    @CreateDateColumn()
-    createdAt:Date
+  @Column({ type: 'int' })
+  durationInDays: number;
 
-    @UpdateDateColumn()
-    updatedAt:Date
+  @CreateDateColumn()
+  createdAt: Date;
 
+  @UpdateDateColumn()
+  updatedAt: Date;
 }

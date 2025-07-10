@@ -21,4 +21,18 @@ export class TransactionController {
 
     return result;
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('/verify-payment/:token')
+  async verifyPayment(
+    @Req() req: Express.Request,
+    @Param() { token }: { token: string },
+  ) {
+    const result = await this.transactionService.verifyPayment(
+      token,
+      req.user.id,
+    );
+
+    return result;
+  }
 }

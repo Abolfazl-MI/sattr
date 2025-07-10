@@ -9,6 +9,7 @@ export class CouponDataAccessService {
     @InjectRepository(CouponEntity)
     private readonly couponRepository: Repository<CouponEntity>,
   ) {}
+
   findCoupon(code: string) {
     return this.couponRepository.findOneBy({
       code,
@@ -16,5 +17,13 @@ export class CouponDataAccessService {
       expiresAt: MoreThan(new Date()),
       capacity: MoreThan(0),
     });
+  }
+
+  findById(id: number) {
+    return this.couponRepository.findOneBy({ id , isActive:true });
+  }
+
+  update(coupon: CouponEntity) {
+    return this.couponRepository.update({ id: coupon.id }, coupon);
   }
 }

@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   HttpException,
   HttpStatus,
@@ -18,6 +19,8 @@ import { PlanDataAccess } from 'src/plan/plan.dataAccess.service';
 import { CouponService } from 'src/coupon/services/coupon.service';
 import { BookEntity } from 'src/book/entities/book.entity';
 import { PlanEntity } from 'src/plan/entity/plan.entity';
+import { Status } from './enums/status.enum';
+import { UserEntity } from 'src/user/entity/user.entity';
 
 @Injectable()
 export class TransactionService {
@@ -113,7 +116,71 @@ export class TransactionService {
     }
   }
 
-  verifyPayment() {
-    return { message: 'Success' };
+  async verifyPayment(token: string, userId: string) {
+    try {
+      console.log(token);
+      const transaction = await this.transactionEntity.findOne({
+        where: {
+          token,
+          status: Status.PENDING,
+        },
+        relations: {
+          user: { userMeta: { books: true } },
+          book: true,
+          plan: true,
+        },
+      });
+
+      if (!transaction) throw new NotFoundException('Transaction not found!');
+
+      //! Request to payment provider to verify payment
+
+      const verifyPaymentResult = {
+        status: 200,
+      };
+
+      if (verifyPaymentResult.status !== 200) {
+        await this.transactionEntity.update(
+          { id: transaction.id },
+          {
+            status: Status.CANCELED,
+          },
+        );
+        throw new BadRequestException('The transaction was not successful!');
+      }
+
+      if (transaction?.purchaseType === PurchaseType.INDIVIDUAL) {
+        await this.verifyIndividualPayment(transaction.user, transaction.book);
+      } else {
+        this.verifyPlanPayment(transaction.user, transaction.plan);
+      }
+
+      if (transaction.couponId) {
+        await this.couponService.decreaseCouponCapacity(transaction.couponId);
+      }
+
+      await this.transactionEntity.update(
+        { id: transaction.id },
+        {
+          status: Status.CONFIRMED,
+        },
+      );
+
+      return { message: 'Verify payment is complete!' };
+    } catch (error) {
+      if (error?.response?.error) throw error;
+      console.log(error);
+      throw new InternalServerErrorException(
+        'There was an internal server error! Try again later',
+      );
+    }
   }
+
+  async verifyIndividualPayment(user: UserEntity, book: BookEntity) {
+    user.userMeta.books.push(book);
+
+    await this.userDataAccess.updateUserMeta(user.userMeta);
+  }
+
+  async verifyPlanPayment(user: UserEntity, plan: PlanEntity) {}
 }
