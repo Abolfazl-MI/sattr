@@ -42,6 +42,7 @@ export class UserDataAcess {
     }
 
     async getUserProfile({ id }: SingleIdValidator) {
+        // todo return plan information from user meta
         const profile = await this.repository.findOne({
             where: {
                 id: id,

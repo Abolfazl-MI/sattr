@@ -1,4 +1,4 @@
-import { IsAlphanumeric, IsEmail, IsOptional, IsString } from "class-validator";
+import { IsAlphanumeric, IsEmail, IsOptional, IsPhoneNumber, IsString } from "class-validator";
 
 
 export class UpdateProfileRequestDto {
@@ -8,8 +8,7 @@ export class UpdateProfileRequestDto {
     name?: string;
     @IsEmail()
     @IsOptional()
-    email?: string;
-    // TODO discuss about user phone number update
+    email?: string;    
     profilePicture?:string;
 }
 
