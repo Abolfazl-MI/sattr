@@ -190,6 +190,7 @@ export class TransactionService {
 
     userMeta.subscriptionStartedAt = now;
     userMeta.subscriptionExpiresAt = expiresAt;
+    userMeta.plan = plan;
 
     await this.userDataAccess.updateUserMeta(userMeta);
   }

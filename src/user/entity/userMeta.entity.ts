@@ -3,12 +3,14 @@ import {
   CreateDateColumn,
   Entity,
   ManyToMany,
+  ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { UserEntity } from './user.entity';
 import { BookEntity } from 'src/book/entities/book.entity';
+import { PlanEntity } from 'src/plan/entity/plan.entity';
 
 @Entity('user_meta')
 export class UserMetaEntity {
@@ -28,6 +30,9 @@ export class UserMetaEntity {
 
   @Column({ type: 'timestamp', nullable: true })
   subscriptionExpiresAt: Date;
+
+  @ManyToOne(() => PlanEntity, (plan) => plan.users)
+  plan: PlanEntity;
 
   @CreateDateColumn()
   createdAt: Date;

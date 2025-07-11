@@ -1,7 +1,11 @@
+import { UserEntity } from 'src/user/entity/user.entity';
+import { UserMetaEntity } from 'src/user/entity/userMeta.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -25,6 +29,9 @@ export class PlanEntity {
 
   @Column({ default: true, type: 'boolean' })
   isActive: boolean;
+
+  @OneToMany(() => UserMetaEntity, (user) => user.plan)
+  users: UserMetaEntity[];
 
   @Column({ type: 'int' })
   durationInDays: number;
