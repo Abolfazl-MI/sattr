@@ -118,7 +118,6 @@ export class TransactionService {
 
   async verifyPayment(token: string, userId: string) {
     try {
-      console.log(token);
       const transaction = await this.transactionEntity.findOne({
         where: {
           token,
@@ -152,7 +151,7 @@ export class TransactionService {
       if (transaction?.purchaseType === PurchaseType.INDIVIDUAL) {
         await this.verifyIndividualPayment(transaction.user, transaction.book);
       } else {
-        this.verifyPlanPayment(transaction.user, transaction.plan);
+        await this.verifyPlanPayment(transaction.user, transaction.plan);
       }
 
       if (transaction.couponId) {
@@ -182,5 +181,16 @@ export class TransactionService {
     await this.userDataAccess.updateUserMeta(user.userMeta);
   }
 
-  async verifyPlanPayment(user: UserEntity, plan: PlanEntity) {}
+  async verifyPlanPayment(user: UserEntity, plan: PlanEntity) {
+    const userMeta = user.userMeta;
+    const now = new Date();
+    const expiresAt = new Date(
+      now.getTime() + plan.durationInDays * 24 * 60 * 60 * 1000,
+    );
+
+    userMeta.subscriptionStartedAt = now;
+    userMeta.subscriptionExpiresAt = expiresAt;
+
+    await this.userDataAccess.updateUserMeta(userMeta);
+  }
 }
