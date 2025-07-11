@@ -18,8 +18,12 @@ import { BookModule } from './book/book.module';
 import { CategoryEntity } from './book/entities/category.entitiy';
 import { BookEntity } from './book/entities/book.entity';
 import { EpisodeEntity } from './book/entities/episode.entity';
+import { TransactionModule } from './transaction/transaction.module';
+import { TransactionEntity } from './transaction/entities/transaction';
 import { PlanModule } from './plan/plan.module';
 import { PlanEntity } from './plan/entity/plan.entity';
+import { CouponModule } from './coupon/coupon.module';
+import { CouponEntity } from './coupon/entities/coupon.entity';
 import { FeedModule } from './feed/feed.module';
 import { SectionEntity } from './feed/entities/section.entity';
 @Module({
@@ -40,7 +44,9 @@ import { SectionEntity } from './feed/entities/section.entity';
         BookEntity,
         CategoryEntity,
         EpisodeEntity,
+        TransactionEntity,
         PlanEntity,
+        CouponEntity,,
         SectionEntity
       ],
       logging:true,
@@ -49,7 +55,9 @@ import { SectionEntity } from './feed/entities/section.entity';
     UserModule,
     AuthModule,
     BookModule,
+    TransactionModule,
     PlanModule,
+    CouponModule,
     FeedModule,
   ],
   controllers: [AppController],

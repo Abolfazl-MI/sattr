@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindManyOptions, FindOneOptions, Like, Repository } from 'typeorm';
+import { FindManyOptions, FindOneOptions, Like, Repository, FindOptionsWhere } from 'typeorm';
 import { EpisodeEntity } from '../entities/episode.entity';
 import { BookEntity } from '../entities/book.entity';
 import { CategoryEntity } from '../entities/category.entitiy';
@@ -19,8 +19,10 @@ export class BookDataAccess {
     private categoryRepository: Repository<CategoryEntity>,
   ) { }
 
-  findOneById(id: string) {
-    return this.bookRepository.findOne({ where: { id } });
+  findOneById(id: string, whereOption?: FindOptionsWhere<BookEntity>) {
+    return this.bookRepository.findOne({
+      where: [{ ...whereOption, id, isActive: true }],
+    });
   }
 
   findBookEpisodes(bookId: string, skip: number, take: number) {
