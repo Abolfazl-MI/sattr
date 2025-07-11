@@ -48,7 +48,8 @@ export class TransactionService {
       let productAmount = 0;
 
       if (purchaseType === PurchaseType.INDIVIDUAL) {
-        book = await this.bookDataAccess.findOneById(productId, {
+        book = await this.bookDataAccess.findOneById({
+          id: productId,
           price: MoreThan(0),
           isIndividual: true,
         });

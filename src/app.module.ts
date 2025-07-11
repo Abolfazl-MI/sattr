@@ -46,10 +46,9 @@ import { SectionEntity } from './feed/entities/section.entity';
         EpisodeEntity,
         TransactionEntity,
         PlanEntity,
-        CouponEntity,,
+        CouponEntity,
         SectionEntity
       ],
-      logging:true,
       synchronize: true,
     }),
     UserModule,
