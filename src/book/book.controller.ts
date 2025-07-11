@@ -18,13 +18,11 @@ import { AccessEpisodeGuard } from './guards/access-episode.guard';
 export class BookController {
   constructor(private readonly bookService: BookService) {}
 
-  //? TODO Pagination
   @Post('search')
   searchBooks(@Body() searchBlogDto: SearchBookDto) {
     return this.bookService.searchBooks(searchBlogDto.name);
   }
 
-  //? TODO Guard
   @UseGuards(JwtAuthGuard, AccessEpisodeGuard)
   @Get('episodes/:bookId')
   getBookEpisodes(
