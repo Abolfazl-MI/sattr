@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { PlanEntity } from './entity/plan.entity';
+import { PlanEntity } from './entities/plan.entity';
 import { Repository } from 'typeorm';
 import { ListRequestDto } from 'src/common/dtos/listRequestDto.dto';
 import { PlanDataAccess } from './plan.dataAccess.service';

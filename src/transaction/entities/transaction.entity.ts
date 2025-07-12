@@ -9,8 +9,8 @@ import {
 import { Status } from '../enums/status.enum';
 import { BookEntity } from 'src/book/entities/book.entity';
 import { PurchaseType } from '../enums/purchase-type.enum';
-import { PlanEntity } from 'src/plan/entity/plan.entity';
-import { UserEntity } from 'src/user/entity/user.entity';
+import { PlanEntity } from 'src/plan/entities/plan.entity';
+import { UserEntity } from 'src/user/entities/user.entity';
 
 @Entity('transaction')
 export class TransactionEntity {

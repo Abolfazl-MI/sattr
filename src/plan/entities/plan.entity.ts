@@ -1,5 +1,5 @@
-import { UserEntity } from 'src/user/entity/user.entity';
-import { UserMetaEntity } from 'src/user/entity/userMeta.entity';
+import { UserEntity } from 'src/user/entities/user.entity';
+import { UserMetaEntity } from 'src/user/entities/userMeta.entity';
 import {
   Column,
   CreateDateColumn,
@@ -33,7 +33,7 @@ export class PlanEntity {
   @OneToMany(() => UserMetaEntity, (user) => user.plan)
   users: UserMetaEntity[];
 
-  @Column({ type: 'int' })
+  @Column({ type: 'int', default: 0 })
   durationInDays: number;
 
   @CreateDateColumn()

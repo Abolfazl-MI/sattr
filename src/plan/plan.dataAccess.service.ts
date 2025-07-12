@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ListRequestDto } from 'src/common/dtos/listRequestDto.dto';
 import { Repository } from 'typeorm';
-import { PlanEntity } from './entity/plan.entity';
+import { PlanEntity } from './entities/plan.entity';
 
 @Injectable()
 export class PlanDataAccess {

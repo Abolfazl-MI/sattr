@@ -3,7 +3,7 @@ import {
   CreateDateColumn,
   Entity,
   JoinTable,
-  ManyToMany,
+
   ManyToMany,
   ManyToOne,
   OneToMany,
@@ -12,7 +12,7 @@ import {
 } from 'typeorm';
 import { CategoryEntity } from './category.entitiy';
 import { EpisodeEntity } from './episode.entity';
-import { UserMetaEntity } from 'src/user/entity/userMeta.entity';
+import { UserMetaEntity } from 'src/user/entities/userMeta.entity';
 import { SectionEntity } from 'src/feed/entities/section.entity';
 
 @Entity('book')
