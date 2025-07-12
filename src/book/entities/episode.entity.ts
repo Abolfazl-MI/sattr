@@ -2,11 +2,13 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { BookEntity } from './book.entity';
+import { UserFavoriteEntity } from 'src/user/entity/user.favorites';
 
 @Entity('episode')
 export class EpisodeEntity {
@@ -33,4 +35,6 @@ export class EpisodeEntity {
 
   @UpdateDateColumn()
   updatedAt: Date;
+  @ManyToMany(() => UserFavoriteEntity, userFav => userFav.favoritedEpisodeds)
+  favoritedBy: UserFavoriteEntity[];
 }
