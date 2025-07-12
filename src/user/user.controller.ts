@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Put, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Put, Query, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { UserService } from './services/user.service';
 import { JwtAuthGuard } from 'src/common/guards/jwt.auth.guard';
 import { UpdateProfileRequestDto } from './dtos/update.profile.dto';
@@ -6,6 +6,8 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { multerOptions } from 'src/common/utills/upload.config';
 import path, { join, relative } from 'path';
 import { SingleIdValidator } from 'src/common/dtos/single-id-validator';
+import { AddFavoriteQueryDto, FavoiresFilter, GetFavoritesQueryDto, ListFavoriteItemsDto } from './dtos/userFavorite.request.dto';
+import { ListRequestDto } from 'src/common/dtos/listRequestDto.dto';
 
 @Controller('user')
 export class UserController {
@@ -36,5 +38,48 @@ export class UserController {
     }
 
     return this.userService.updateUserProfie(new SingleIdValidator(request.user.id), body)
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/favorites')
+  async getUserFavorites(
+    @Req() { user }: Express.Request,
+    @Query() query: GetFavoritesQueryDto,
+    @Query() listRequest: ListRequestDto
+  ) {
+    const { filter } = query
+    const listFavItemRequest: ListFavoriteItemsDto = {
+      id: user.id,
+      listRequest
+    }
+    switch (filter) {
+      case FavoiresFilter.books:
+        return this.userService.getFavoriteBooks(listFavItemRequest)
+      case FavoiresFilter.episodes:
+        return this.userService.getFavoriteEpisodes(listFavItemRequest)
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('/favorites/book/:id')
+  async addBookToFavorite(
+    @Req() { user }: Express.Request,
+    @Param() { id }: SingleIdValidator
+  ) {
+    return this.userService.addBookToFav({
+      userId: user.id,
+      entityId: id
+    })
+  }
+  @UseGuards(JwtAuthGuard)
+  @Patch('/favorites/episode/:id')
+  async addEpisodeToFavorite(
+    @Req() { user }: Express.Request,
+    @Param() { id }: SingleIdValidator
+  ) {
+    return this.userService.addEpisodeToFav({
+      userId: user.id,
+      entityId: id
+    })
   }
 }
