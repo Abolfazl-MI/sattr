@@ -5,9 +5,9 @@ import { JwtTokenService } from './jwt.service';
 import { UserModule } from '../user/user.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserEntity } from '../user/entity/user.entity';
-import { ListenTimeEntity } from '../user/entity/listenTime.entity';
-import { UserMetaEntity } from '../user/entity/userMeta.entity';
+import { UserEntity } from '../user/entities/user.entity';
+import { ListenTimeEntity } from '../user/entities/listenTime.entity';
+import { UserMetaEntity } from '../user/entities/userMeta.entity';
 import { UserService } from '../user/user.service';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 

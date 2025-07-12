@@ -10,7 +10,7 @@ import {
 } from 'typeorm';
 import { UserEntity } from './user.entity';
 import { BookEntity } from 'src/book/entities/book.entity';
-import { PlanEntity } from 'src/plan/entity/plan.entity';
+import { PlanEntity } from 'src/plan/entities/plan.entity';
 
 @Entity('user_meta')
 export class UserMetaEntity {

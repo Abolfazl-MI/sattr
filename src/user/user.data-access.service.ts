@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UserEntity } from './entity/user.entity';
+import { UserEntity } from './entities/user.entity';
 import {
   FindManyOptions,
   FindOneOptions,
   FindOptionsWhere,
   Repository,
 } from 'typeorm';
-import { UserMetaEntity } from './entity/userMeta.entity';
+import { UserMetaEntity } from './entities/userMeta.entity';
 import { BookEntity } from 'src/book/entities/book.entity';
 
 @Injectable()

@@ -12,15 +12,15 @@ import { UserDataAccess } from 'src/user/user.data-access.service';
 import { MoreThan, Repository } from 'typeorm';
 import { BuyProductDto } from './dtos/buy-product.dto';
 import { v4 as uuid } from 'uuid';
-import { TransactionEntity } from './entities/transaction';
+import { TransactionEntity } from './entities/transaction.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PurchaseType } from './enums/purchase-type.enum';
 import { PlanDataAccess } from 'src/plan/plan.dataAccess.service';
 import { CouponService } from 'src/coupon/services/coupon.service';
 import { BookEntity } from 'src/book/entities/book.entity';
-import { PlanEntity } from 'src/plan/entity/plan.entity';
+import { PlanEntity } from 'src/plan/entities/plan.entity';
 import { Status } from './enums/status.enum';
-import { UserEntity } from 'src/user/entity/user.entity';
+import { UserEntity } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class TransactionService {
