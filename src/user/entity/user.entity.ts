@@ -3,12 +3,14 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  JoinTable,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { ListenTimeEntity } from './listenTime.entity';
 import { UserMetaEntity } from './userMeta.entity';
+import { UserFavoriteEntity } from './user.favorites';
 
 export enum UserRole {
   ADMIN = 'ADMIN',
@@ -51,4 +53,7 @@ export class UserEntity {
   @UpdateDateColumn()
   updatedAt: Date;
 
+  @OneToOne(() => UserFavoriteEntity, { onDelete: 'CASCADE' })
+  @JoinTable()
+  favorites: UserFavoriteEntity
 }

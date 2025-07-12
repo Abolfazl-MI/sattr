@@ -6,11 +6,15 @@ import { Repository } from 'typeorm';
 import { UserDataAcess } from './user.dataAcess.service';
 import { SingleIdValidator } from 'src/common/dtos/single-id-validator';
 import { UpdateProfileRequestDto } from '../dtos/update.profile.dto';
+import { UserFavoriteDataAcess } from './user.favorites.dataAcess';
+import { ListFavoriteItemsDto, UserFavoriteRequestDto } from '../dtos/userFavorite.request.dto';
+import { ListRequestDto } from 'src/common/dtos/listRequestDto.dto';
 
 @Injectable()
 export class UserService {
   constructor(
-    private readonly userDataAcess: UserDataAcess
+    private readonly userDataAcess: UserDataAcess,
+    private readonly favoriteDataAcess: UserFavoriteDataAcess
   ) { }
 
   async registerUser(data: RegisterUserRequestDto): Promise<UserEntity> {
@@ -26,5 +30,27 @@ export class UserService {
   }
   async updateUserProfie(id: SingleIdValidator, request: UpdateProfileRequestDto) {
     return this.userDataAcess.updateProfile(id.id, request)
+  }
+
+  async addBookToFav(request: UserFavoriteRequestDto) {
+    return this.favoriteDataAcess.addBookToUserFavorite(request)
+  }
+
+  async removeBookFromFav(request: UserFavoriteRequestDto) {
+    return this.favoriteDataAcess.removeBookFromFavorites(request)
+  }
+
+  async addEpisodeToFav(request: UserFavoriteRequestDto) {
+    return this.favoriteDataAcess.addEpisodeToUserFavorite(request)
+  }
+
+  async removeEpiseFromFav(request: UserFavoriteRequestDto) {
+    return this.favoriteDataAcess.removeEpisodeFromUserFavorite(request)
+  }
+  async getFavoriteBooks(request: ListFavoriteItemsDto) {
+    return this.favoriteDataAcess.listFavrotedBooks(request)
+  }
+  async getFavoriteEpisodes(request: ListFavoriteItemsDto) {
+    return this.favoriteDataAcess.listFavrotedEpisodes(request)
   }
 }
