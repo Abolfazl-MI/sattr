@@ -1,4 +1,4 @@
-import { IsInt, IsNumber, IsOptional, Min , Max} from 'class-validator';
+import { IsInt, IsNumber, IsOptional, Min, Max } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class ListRequestDto {
@@ -7,11 +7,13 @@ export class ListRequestDto {
     @Max(10)
     @Type(() => Number)
     @IsOptional()
-    take?: number
+    take: number = 10
 
     @IsInt()
     @Min(0, { message: 'skip must be greater than 0' })
     @Type(() => Number)
     @IsOptional()
-    skip?: number
+    skip: number = 0
+
+
 }
