@@ -58,3 +58,7 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 *.env
 
 package-lock.json
+
+/public/*
+
+*.pem

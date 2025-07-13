@@ -32,6 +32,12 @@ export class UserEntity {
   @Column({ default: true })
   isActive: boolean;
 
+  @Column({ nullable: true })
+  passowrd?: string
+
+  @Column({ default: false })
+  isEmailVerified: boolean
+  
   @Column({ default: UserRole.USER, enum: UserRole, type: 'enum' })
   role: UserRole;
 

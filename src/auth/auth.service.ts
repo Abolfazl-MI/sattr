@@ -14,23 +14,34 @@ import { UserService } from '../user/user.service';
 import { RegisterUserRequestDto } from '../common/dto/registerUserRequestDto';
 
 import { generateOtpCode } from '../common/utills/otp.gen';
-import { VerifyOtpRequestDto } from './dto/verifyOtpRequest.dto';
+import { VerifyOtpRequestDto } from './dto/verify-request.dto';
 import { RefreshTokenRequestDto } from './dto/refreshTokenRequest.dto';
 import { JsonWebTokenError } from '@nestjs/jwt';
-
+import { LoginRequestDto } from './dto/login-request.dto';
+import * as bcrypt from 'bcrypt'
+import { ForgetPasswordRequest } from './dto/forget-request.dto';
+import { RequiredParamValidator, SingleIdValidator, VerifyForgetPasswordRequestDto } from 'src/common/dtos/single-id-validator';
+import { JwtPayload } from 'src/common/interfaces/jwt.payload';
 @Injectable()
 export class AuthService {
   constructor(
     @Inject(CACHE_MANAGER) private cache: Cache,
     private readonly jwtTokenService: JwtTokenService,
     private readonly userService: UserService,
-  ) {}
+  ) { }
 
   private OTP_PREFIX = 'otp:';
+  private EMAIL_VERIFY_KEY = 'email-verify'
   private OTP_LIMIT_PREFIX = 'otp-limit:';
   private REFRESH_PREFIX = 'refresh:';
-
+  private FORGET_PERFIX = 'forget'
   async requestOtp(request: RegisterUserRequestDto) {
+    const userExist = await this.userService.userExists({
+      where: {
+        phone: request.phone
+      }
+    })
+    if (userExist) throw new BadRequestException('User with provided phone number exists')
     const otpKey = `${this.OTP_PREFIX}${request.phone}`;
     const limit = await this.cache.get<string>(otpKey);
 
@@ -74,6 +85,61 @@ export class AuthService {
       },
     };
   }
+  /* use same as forget password for token generation */
+  async sendEmailVerificationLink({ id }: SingleIdValidator) {
+    const user = await this.userService.findUserById(id);
+    if (!user) throw new UnauthorizedException('user not found')
+    if (user.isEmailVerified) {
+      return {
+        message: 'Already Verified'
+      }
+    }
+    const token = await this.jwtTokenService.generateForgetToken(user.id)
+    const hasRequestBefore = await this.cache.get(`${this.EMAIL_VERIFY_KEY}${user.email}`);
+    // if(hasRequestBefore) throw new BadRequestException('Verification already sent')
+
+    await this.cache.set(`${this.EMAIL_VERIFY_KEY}${user.email}`, token, 2 * 60 * 1000)
+
+
+    let url = process.env.NODE_ENV === 'development' ? `http://localhost:${process.env.PORT || 3000}/verify-email/${token}` : `${process.env.BASE_URL}/verify-email/${token}`
+
+    // todo send email
+
+    return {
+      message: 'verification link sent',
+      ...(process.env.NODE_ENV === 'development' && { url, token })
+    }
+  }
+
+  async verifyEmail({ id }: SingleIdValidator, param: RequiredParamValidator) {
+    const { param: token } = param
+
+    const user = await this.userService.findUserById(id)
+
+
+    const key = `${this.EMAIL_VERIFY_KEY}${user.email}`
+    const storedToken = await this.cache.get(key)
+
+    if (!storedToken) throw new BadRequestException('Invalid or Expired link')
+
+    try {
+      const { sub }: JwtPayload = await this.jwtTokenService.verifyForgetToken(token)
+      await this.cache.del(key);
+      if (sub === user.id) {
+        await this.userService.verifyUserEmail(user.id)
+        return {
+          message: "verified"
+        }
+      } else {
+        throw new BadRequestException('Invalid or Expired link')
+      }
+    } catch (error) {
+      if (error instanceof JsonWebTokenError)
+        throw new BadRequestException('Invalid or Expired link')
+
+      throw new InternalServerErrorException()
+    }
+  }
 
   async refreshToken(
     request: RefreshTokenRequestDto,
@@ -107,6 +173,117 @@ export class AuthService {
     } catch (error) {
       console.log(error);
 
+      if (error instanceof JsonWebTokenError)
+        throw new BadRequestException('Refresh token expired');
+
+      throw new InternalServerErrorException('');
+    }
+  }
+
+  async login(request: LoginRequestDto) {
+    const { phone, email, password } = request
+    const user = await this.userService.findUser({
+      where: {
+        phone, email
+      }
+    })
+    if (!user || !user.passowrd) throw new BadRequestException('Username or password is wrong')
+
+    const samePassword = await bcrypt.compare(password, user.passowrd)
+    if (!samePassword) throw new BadRequestException('Username or password is wrong')
+
+    await this.cache.del(`${this.REFRESH_PREFIX}${user.id}`)
+    const { accessToken, refreshToken } =
+      await this.jwtTokenService.generateTokens(user.id);
+    await this.cache.set(`${this.REFRESH_PREFIX}${user.id}`, refreshToken,
+      7 * 24 * 60 * 60, // store for 7 days in redis
+    )
+    return {
+      profile: user,
+      accessToken,
+      refreshToken
+    }
+  }
+  /**
+   * forget password action could sent email or sms, if flag sendWithEmail passed
+   * could send the link with email but before it user has to provide email and verified before using email addrress
+   *  a @token whihc is generated for the url is jwt token which has diffrent algorithm=> and it is : @RS384 
+   * user IP and token would be set in redis for 15 min , users are only allowed request forget every 15 min 
+   * 
+   *  the token would be set with user forget:{user ip} => forget:192.143.232.12 
+   */
+  async forgetPassowrd(request: ForgetPasswordRequest) {
+    const { phone, sendWithEmail, ipAdress } = request
+    const user = await this.userService.findUser({
+      where: {
+        phone
+      }
+    })
+
+    if (!user) throw new NotFoundException('User with provided information not found')
+    if (sendWithEmail && (!user.email || !user.isEmailVerified)) throw new BadRequestException('Email not found')
+
+    // check if previously requested 
+    const key = `${this.FORGET_PERFIX}${ipAdress}`
+    const hasRequested = await this.cache.get(key)
+    if (hasRequested) throw new BadRequestException('Multiple Forget Request Not allowed')
+
+    const token = await this.jwtTokenService.generateForgetToken(user.id)
+
+    await this.cache.set(key, token, 15 * 60 * 1000)
+
+    let url = process.env.NODE_ENV === 'development' ? `http://localhost:${process.env.PORT || 3000}/forget-possword/${token}` : `${process.env.BASE_URL}/forget-possword/${token}`
+
+
+    if (sendWithEmail) {
+      // send with email provider impl later
+    } else {
+      // send sms 
+    }
+
+    if (process.env.NODE_ENV === 'development') {
+      return {
+        message: 'instuction sent',
+        url
+      }
+    }
+
+    return {
+      message: 'instuction sent'
+    }
+  }
+
+  /***
+   * @verify_password this route get the token from route
+   * first query the redis to get user latess forget token 
+   * the format is forget{userip} => forget192.168.1.103
+   * if token found would decode it and then create access token 
+   * the key point is that signature and algorithems of access and forget
+   * token are diffrent , the access generated when confiremed only lasts for 5 min 
+   */
+
+  async verifyForgetPasswordRequest(request: VerifyForgetPasswordRequestDto) {
+    const { token, ipAddress } = request
+    console.log(token, ipAddress)
+    const key = `${this.FORGET_PERFIX}${ipAddress}`
+
+    const tokenValue = await this.cache.get(key)
+    if (!tokenValue) throw new UnauthorizedException('Invalid or Expired link')
+
+    try {
+      const { sub }: JwtPayload = await this.jwtTokenService.verifyForgetToken(token)
+      const userExists = await this.userService.userExists({
+        where: {
+          id: sub
+        }
+      })
+      if (!userExists) throw new UnauthorizedException('UnAuthorized request')
+      const accessToken = await this.jwtTokenService.generateAccessToken(sub)
+      return {
+        accessToken,
+        message: 'this token last only 5min, change your password by update'
+      }
+    } catch (error) {
       if (error instanceof JsonWebTokenError)
         throw new BadRequestException('Refresh token expired');
 
