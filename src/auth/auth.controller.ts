@@ -1,5 +1,17 @@
-import { Body, Controller, Ip, Param, Patch, Post, Put, Req, Res, UseGuards, Get } from '@nestjs/common';
-import { AuthService } from './auth.service';
+import {
+  Body,
+  Controller,
+  Ip,
+  Param,
+  Patch,
+  Post,
+  Put,
+  Req,
+  Res,
+  UseGuards,
+  Get,
+} from '@nestjs/common';
+import { AuthService } from './services/auth.service';
 import { RegisterUserRequestDto } from '../common/dto/registerUserRequestDto';
 import { VerifyOtpRequestDto } from './dto/verify-request.dto';
 import { RefreshTokenRequestDto } from './dto/refreshTokenRequest.dto';
@@ -11,12 +23,12 @@ import { ForgetPasswordRequest } from './dto/forget-request.dto';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) { }
+  constructor(private readonly authService: AuthService) {}
 
   // Get password
   @Post('/register')
   async registerUser(@Body() body: RegisterUserRequestDto) {
-    const code = await this.authService.requestOtp(body);
+    const code = await this.authService.registerUser(body);
     if (process.env.NODE_ENV === 'development') {
       return code;
     } else {
@@ -31,7 +43,7 @@ export class AuthController {
     @Body() body: VerifyOtpRequestDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const result = await this.authService.verifyOtp(body);
+    const result = await this.authService.verifyUser(body);
     const {
       token: { accessToken, refreshToken },
     } = result;
@@ -64,13 +76,13 @@ export class AuthController {
     return { accessToken };
   }
 
-  
   @Post('/login')
   async login(
     @Body() body: LoginRequestDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const { accessToken, profile, refreshToken } = await this.authService.login(body)
+    const { accessToken, profile, refreshToken } =
+      await this.authService.login(body);
 
     res.cookie('refresh_token', refreshToken, {
       httpOnly: true,
@@ -80,50 +92,44 @@ export class AuthController {
     });
     return {
       profile,
-      accessToken
-    }
+      accessToken,
+    };
   }
 
   @Put('/forget-password')
   async handleForgetPassword(
     @Body() { phone, sendWithEmail }: ForgetPasswordRequest,
-    @Ip() ip
+    @Ip() ip,
   ) {
     return await this.authService.forgetPassword({
       ipAddress: ip,
       phone,
-      sendWithEmail
-    })
+      sendWithEmail,
+    });
   }
 
-  // Change 
+  // Change
   @UseGuards(JwtAuthGuard)
   @Post('/verify-email')
-  async sendVerifyEmailLink(
-    @Req() { user }: Express.Request
-  ) {
-    return await this.authService.sendEmailVerificationLink({ id: user.id })
+  async sendVerifyEmailLink(@Req() { user }: Express.Request) {
+    return await this.authService.sendEmailVerificationLink({ id: user.id });
   }
 
   @Get('/forget-password/:param')
-  async handelForgetVerify(
-    @Param() param: RequiredParamValidator,
-    @Ip() ip
-  ) {
-    console.log(ip)
+  async handelForgetVerify(@Param() param: RequiredParamValidator, @Ip() ip) {
+    console.log(ip);
     return this.authService.verifyForgetPasswordRequest({
       ipAddress: ip,
-      token: param.param
-    })
+      token: param.param,
+    });
   }
 
   @UseGuards(JwtAuthGuard)
   @Put('/verify-email/:param')
   async verifyEmail(
     @Req() { user }: Express.Request,
-    @Param() param: RequiredParamValidator
+    @Param() param: RequiredParamValidator,
   ) {
-    return await this.authService.verifyEmail({ id: user.id }, param)
+    return await this.authService.verifyEmail({ id: user.id }, param);
   }
-
 }
