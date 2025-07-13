@@ -1,17 +1,12 @@
-import { IsBoolean, IsOptional, IsPhoneNumber } from "class-validator";
-
-
-
-
+import { IsBoolean, IsOptional, IsPhoneNumber } from 'class-validator';
 
 export class ForgetPasswordRequest {
-    @IsPhoneNumber('IR')
-    phone: string
+  @IsPhoneNumber('IR')
+  phone: string;
 
-    @IsBoolean()
-    @IsOptional()
-    sendWithEmail?: boolean
+  @IsBoolean()
+  @IsOptional()
+  sendWithEmail?: boolean;
 
-    ipAdress: string
+  ipAddress: string;
 }
-

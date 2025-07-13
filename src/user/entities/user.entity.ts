@@ -33,7 +33,7 @@ export class UserEntity {
   isActive: boolean;
 
   @Column({ nullable: true })
-  passowrd?: string
+  password?: string
 
   @Column({ default: false })
   isEmailVerified: boolean

@@ -30,11 +30,12 @@ export class AuthService {
     private readonly userService: UserService,
   ) { }
 
+  // Use bcrypt in verify 
   private OTP_PREFIX = 'otp:';
   private EMAIL_VERIFY_KEY = 'email-verify'
   private OTP_LIMIT_PREFIX = 'otp-limit:';
   private REFRESH_PREFIX = 'refresh:';
-  private FORGET_PERFIX = 'forget'
+  private FORGET_PREFIX = 'forget'
   async requestOtp(request: RegisterUserRequestDto) {
     const userExist = await this.userService.userExists({
       where: {
@@ -187,9 +188,9 @@ export class AuthService {
         phone, email
       }
     })
-    if (!user || !user.passowrd) throw new BadRequestException('Username or password is wrong')
+    if (!user || !user.password) throw new BadRequestException('Username or password is wrong')
 
-    const samePassword = await bcrypt.compare(password, user.passowrd)
+    const samePassword = await bcrypt.compare(password, user.password)
     if (!samePassword) throw new BadRequestException('Username or password is wrong')
 
     await this.cache.del(`${this.REFRESH_PREFIX}${user.id}`)
@@ -204,16 +205,11 @@ export class AuthService {
       refreshToken
     }
   }
-  /**
-   * forget password action could sent email or sms, if flag sendWithEmail passed
-   * could send the link with email but before it user has to provide email and verified before using email addrress
-   *  a @token whihc is generated for the url is jwt token which has diffrent algorithm=> and it is : @RS384 
-   * user IP and token would be set in redis for 15 min , users are only allowed request forget every 15 min 
-   * 
-   *  the token would be set with user forget:{user ip} => forget:192.143.232.12 
-   */
-  async forgetPassowrd(request: ForgetPasswordRequest) {
-    const { phone, sendWithEmail, ipAdress } = request
+  
+  // Use crypto instead jwt
+  // 
+  async forgetPassword(request: ForgetPasswordRequest) {
+    const { phone, sendWithEmail, ipAddress } = request
     const user = await this.userService.findUser({
       where: {
         phone
@@ -224,7 +220,7 @@ export class AuthService {
     if (sendWithEmail && (!user.email || !user.isEmailVerified)) throw new BadRequestException('Email not found')
 
     // check if previously requested 
-    const key = `${this.FORGET_PERFIX}${ipAdress}`
+    const key = `${this.FORGET_PREFIX}${ipAddress}`
     const hasRequested = await this.cache.get(key)
     if (hasRequested) throw new BadRequestException('Multiple Forget Request Not allowed')
 
@@ -232,7 +228,7 @@ export class AuthService {
 
     await this.cache.set(key, token, 15 * 60 * 1000)
 
-    let url = process.env.NODE_ENV === 'development' ? `http://localhost:${process.env.PORT || 3000}/forget-possword/${token}` : `${process.env.BASE_URL}/forget-possword/${token}`
+    let url = process.env.NODE_ENV === 'development' ? `http://localhost:${process.env.PORT || 3000}/forget-password/${token}` : `${process.env.BASE_URL}/forget-password/${token}`
 
 
     if (sendWithEmail) {
@@ -243,29 +239,22 @@ export class AuthService {
 
     if (process.env.NODE_ENV === 'development') {
       return {
-        message: 'instuction sent',
+        message: 'instruction sent',
         url
       }
     }
 
     return {
-      message: 'instuction sent'
+      message: 'instruction sent'
     }
   }
 
-  /***
-   * @verify_password this route get the token from route
-   * first query the redis to get user latess forget token 
-   * the format is forget{userip} => forget192.168.1.103
-   * if token found would decode it and then create access token 
-   * the key point is that signature and algorithems of access and forget
-   * token are diffrent , the access generated when confiremed only lasts for 5 min 
-   */
-
+  // Use phone crypto instead ipAddress
+  // 
   async verifyForgetPasswordRequest(request: VerifyForgetPasswordRequestDto) {
     const { token, ipAddress } = request
     console.log(token, ipAddress)
-    const key = `${this.FORGET_PERFIX}${ipAddress}`
+    const key = `${this.FORGET_PREFIX}${ipAddress}`
 
     const tokenValue = await this.cache.get(key)
     if (!tokenValue) throw new UnauthorizedException('Invalid or Expired link')

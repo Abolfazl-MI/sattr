@@ -13,6 +13,7 @@ import { ForgetPasswordRequest } from './dto/forget-request.dto';
 export class AuthController {
   constructor(private readonly authService: AuthService) { }
 
+  // Get password
   @Post('/register')
   async registerUser(@Body() body: RegisterUserRequestDto) {
     const code = await this.authService.requestOtp(body);
@@ -63,6 +64,7 @@ export class AuthController {
     return { accessToken };
   }
 
+  
   @Post('/login')
   async login(
     @Body() body: LoginRequestDto,
@@ -87,13 +89,14 @@ export class AuthController {
     @Body() { phone, sendWithEmail }: ForgetPasswordRequest,
     @Ip() ip
   ) {
-    return await this.authService.forgetPassowrd({
-      ipAdress: ip,
+    return await this.authService.forgetPassword({
+      ipAddress: ip,
       phone,
       sendWithEmail
     })
   }
 
+  // Change 
   @UseGuards(JwtAuthGuard)
   @Post('/verify-email')
   async sendVerifyEmailLink(

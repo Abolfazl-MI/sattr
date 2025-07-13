@@ -3,12 +3,10 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtTokenService } from './jwt.service';
 import { UserModule } from '../user/user.module';
-import { CacheModule } from '@nestjs/cache-manager';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from '../user/entities/user.entity';
 import { ListenTimeEntity } from '../user/entities/listenTime.entity';
 import { UserMetaEntity } from '../user/entities/userMeta.entity';
-import { UserService } from '../user/user.service';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 
 @Module({

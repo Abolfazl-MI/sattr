@@ -32,7 +32,6 @@ export class JwtTokenService {
   }
 
   async verifyAccessToken(token: string): Promise<JwtPayload> {
-    console.log('Atal matal')
     return this.jwtService.verifyAsync(token, {
       secret: process.env.JWT_ACCESS_SECRET,
     });

@@ -1,17 +1,4 @@
-import { IsDefined, IsEmail, IsOptional, IsPhoneNumber, IsString, IsStrongPassword, Validate, ValidateIf, ValidationArguments, ValidatorConstraintInterface } from "class-validator"
-
-
-class AtLeastOneContactConstraint implements ValidatorConstraintInterface {
-    validate(value: any, args?: ValidationArguments): Promise<boolean> | boolean {
-        const { email, phone } = args?.object as any;
-        return !!email || !!phone;
-    }
-    defaultMessage(validationArguments?: ValidationArguments): string {
-        return 'Either email or phone must be provided'
-    }
-}
-
-
+import { IsDefined, IsEmail, IsPhoneNumber, IsString, IsStrongPassword, ValidateIf, ValidationArguments, ValidatorConstraintInterface } from "class-validator"
 
 export class LoginRequestDto {
 
