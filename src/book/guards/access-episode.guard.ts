@@ -24,7 +24,7 @@ export class AccessEpisodeGuard implements CanActivate {
       const request = context.switchToHttp().getRequest();
       const userId = (request as any).user?.id;
       const episodeId = request?.params?.episodeId;
-      const bookId = request.params.bookId;
+      const bookId = request.params?.bookId;
 
       // Validate is ids uuid
       await this.validateId(bookId || episodeId);
