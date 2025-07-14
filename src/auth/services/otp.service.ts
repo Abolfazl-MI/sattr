@@ -5,7 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { generateOtpCode } from 'src/common/utills/otp.gen';
+import { generateOtpCode } from 'src/common/utils/otp.gen';
 import { Cache } from 'cache-manager';
 
 @Injectable()
@@ -33,5 +33,7 @@ export class OtpService {
     if (!savedOtp || savedOtp !== code) {
       throw new UnauthorizedException('Invalid or expired OTP');
     }
+
+    await this.cache.del(otpKey);
   }
 }

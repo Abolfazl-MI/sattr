@@ -1,15 +1,15 @@
 import {
   Body,
   Controller,
-  Ip,
   Param,
-  Patch,
   Post,
   Put,
   Req,
   Res,
   UseGuards,
   Get,
+  UseInterceptors,
+  ClassSerializerInterceptor,
 } from '@nestjs/common';
 import { AuthService } from './services/auth.service';
 import { RegisterUserRequestDto } from '../common/dto/registerUserRequestDto';
@@ -20,6 +20,7 @@ import { LoginRequestDto } from './dto/login-request.dto';
 import { JwtAuthGuard } from 'src/common/guards/jwt.auth.guard';
 import { RequiredParamValidator } from 'src/common/dtos/single-id-validator';
 import { ForgetPasswordRequest } from './dto/forget-request.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -38,6 +39,7 @@ export class AuthController {
     }
   }
 
+  @UseInterceptors(ClassSerializerInterceptor)
   @Post('/verify')
   async verify(
     @Body() body: VerifyOtpRequestDto,
@@ -96,15 +98,10 @@ export class AuthController {
     };
   }
 
-  @Put('/forget-password')
-  async handleForgetPassword(
-    @Body() { phone, sendWithEmail }: ForgetPasswordRequest,
-    @Ip() ip,
-  ) {
+  @Post('/forget-password')
+  async handleForgetPassword(@Body() { phone }: ForgetPasswordRequest) {
     return await this.authService.forgetPassword({
-      ipAddress: ip,
       phone,
-      sendWithEmail,
     });
   }
 
@@ -115,13 +112,9 @@ export class AuthController {
     return await this.authService.sendEmailVerificationLink({ id: user.id });
   }
 
-  @Get('/forget-password/:param')
-  async handelForgetVerify(@Param() param: RequiredParamValidator, @Ip() ip) {
-    console.log(ip);
-    return this.authService.verifyForgetPasswordRequest({
-      ipAddress: ip,
-      token: param.param,
-    });
+  @Get('/reset-password/')
+  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+    return this.authService.verifyForgetPasswordRequest(resetPasswordDto)
   }
 
   @UseGuards(JwtAuthGuard)

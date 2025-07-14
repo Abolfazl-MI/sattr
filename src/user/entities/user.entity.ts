@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { ListenTimeEntity } from './listenTime.entity';
 import { UserMetaEntity } from './userMeta.entity';
+import { Exclude } from 'class-transformer';
 
 export enum UserRole {
   ADMIN = 'ADMIN',
@@ -32,12 +33,13 @@ export class UserEntity {
   @Column({ default: true })
   isActive: boolean;
 
+  @Exclude()
   @Column({ nullable: true })
-  password?: string
+  password: string;
 
   @Column({ default: false })
-  isEmailVerified: boolean
-  
+  isEmailVerified: boolean;
+
   @Column({ default: UserRole.USER, enum: UserRole, type: 'enum' })
   role: UserRole;
 

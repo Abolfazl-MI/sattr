@@ -10,7 +10,7 @@ import { AuthModule } from './auth/auth.module';
 import * as process from 'node:process';
 import { createKeyv, Keyv } from '@keyv/redis';
 import { CacheableMemory } from 'cacheable';
-import { RedisOptions } from './common/utills/redis.config';
+import { RedisOptions } from './common/utils/redis.config';
 import { UserEntity } from './user/entities/user.entity';
 import { ListenTimeEntity } from './user/entities/listenTime.entity';
 import { UserMetaEntity } from './user/entities/userMeta.entity';

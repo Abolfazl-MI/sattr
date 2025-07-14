@@ -1,4 +1,4 @@
-import { IsDecimal, IsDefined, IsIP, IsString, IsUUID } from 'class-validator';
+import { IsDefined, IsString, IsUUID } from 'class-validator';
 
 export class SingleIdValidator {
   @IsUUID()
@@ -6,19 +6,7 @@ export class SingleIdValidator {
 }
 
 export class RequiredParamValidator {
-
   @IsString()
   @IsDefined()
   param: string;
-
-}
-
-export class VerifyForgetPasswordRequestDto {
-  @IsString()
-  @IsDefined()
-  token: string
-
-  @IsIP()
-  @IsDefined()
-  ipAddress: string
 }
