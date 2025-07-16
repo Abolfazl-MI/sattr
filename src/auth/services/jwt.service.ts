@@ -1,15 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from '../../common/interfaces/jwt.payload';
-import * as fs from 'fs'
+import * as fs from 'fs';
 import * as path from 'path';
 @Injectable()
 export class JwtTokenService {
-  constructor(private readonly jwtService: JwtService) { }
+  constructor(private readonly jwtService: JwtService) {}
 
   private readPrivateKey() {
-    const pathToFile=path.join(process.cwd(),'private.pem')
-    console.log(pathToFile)
+    const pathToFile = path.join(process.cwd(), 'private.pem');
+    console.log(pathToFile);
     const privateKey = fs.readFileSync(pathToFile, 'utf8');
     return privateKey;
   }
@@ -43,17 +43,6 @@ export class JwtTokenService {
     });
   }
 
-  async generateForgetToken(userId: string): Promise<string> {
-    const payload: JwtPayload = { sub: userId };
-    const privateKey= this.readPrivateKey()
-    const token = await this.jwtService.signAsync(payload, {
-      secret: privateKey,
-      expiresIn: '15m',
-      algorithm: 'RS384'
-    });
-    return token
-  }
-
   async generateAccessToken(userId: string, expiresIn: string = '5min') {
     const payload: JwtPayload = { sub: userId };
 
@@ -62,13 +51,5 @@ export class JwtTokenService {
       expiresIn,
     });
     return accessToken;
-  }
-
-  async verifyForgetToken(token: string): Promise<JwtPayload> {
-    const privateKey=this.readPrivateKey()
-    return await this.jwtService.verify(token, {
-      secret: privateKey,
-      algorithms: ['RS384']
-    });
   }
 }

@@ -7,30 +7,35 @@ import { RegisterUserRequestDto } from '../common/dto/registerUserRequestDto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user.entity';
 import { FindManyOptions, FindOneOptions, Repository } from 'typeorm';
-import { encodePassword } from 'src/common/utils/bcrypt';
+import { UserMetaEntity } from './entities/userMeta.entity';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(UserEntity)
-    private readonly repository: Repository<UserEntity>,
+    private readonly userRepository: Repository<UserEntity>,
+    @InjectRepository(UserMetaEntity)
+    private readonly userMetaRepository: Repository<UserMetaEntity>,
   ) {}
 
-  async registerUser(data: RegisterUserRequestDto): Promise<UserEntity> {
+  async registerUser({ phone }: RegisterUserRequestDto): Promise<UserEntity> {
     const isUserExists = await this.userExists({
-      where: { phone: data.phone },
+      where: { phone: phone },
     });
 
     if (isUserExists) throw new BadRequestException();
 
-    return await this.repository.save({
-      phone: data.phone,
-      password: encodePassword(data.password),
-    });
+    const user = this.userRepository.create({ phone });
+    await this.userRepository.save(user);
+
+    const userMeta = this.userMetaRepository.create({ user });
+    await this.userMetaRepository.save(userMeta);
+
+    return user;
   }
 
   async findUserById(id: string): Promise<UserEntity> {
-    const user: UserEntity | null = await this.repository.findOne({
+    const user: UserEntity | null = await this.userRepository.findOne({
       where: {
         id,
       },
@@ -42,14 +47,14 @@ export class UserService {
   }
 
   async findUser(options: FindOneOptions<UserEntity>) {
-    return this.repository.findOne(options);
+    return this.userRepository.findOne(options);
   }
 
   async userExists(options: FindManyOptions<UserEntity>) {
-    return this.repository.exists(options);
+    return this.userRepository.exists(options);
   }
 
-  async verifyUserEmail(id: string) {
-    return this.repository.update({ id }, { isEmailVerified: true ,  });
+  async verifyUserEmail(id: string, email: string) {
+    return this.userRepository.update({ id }, { isEmailVerified: true, email });
   }
 }

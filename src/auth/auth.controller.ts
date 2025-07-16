@@ -14,7 +14,7 @@ import {
 import { AuthService } from './services/auth.service';
 import { RegisterUserRequestDto } from '../common/dto/registerUserRequestDto';
 import { VerifyOtpRequestDto } from './dto/verify-request.dto';
-import { RefreshTokenRequestDto } from './dto/refreshTokenRequest.dto';
+import { RefreshTokenRequestDto } from './dto/refresh-token-request.dto';
 import { Response } from 'express';
 import { LoginRequestDto } from './dto/login-request.dto';
 import { JwtAuthGuard } from 'src/common/guards/jwt.auth.guard';
@@ -105,16 +105,16 @@ export class AuthController {
     });
   }
 
+  @Post('/reset-password/')
+  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+    return this.authService.resetPassword(resetPasswordDto);
+  }
+
   // Change
   @UseGuards(JwtAuthGuard)
   @Post('/verify-email')
   async sendVerifyEmailLink(@Req() { user }: Express.Request) {
     return await this.authService.sendEmailVerificationLink({ id: user.id });
-  }
-
-  @Get('/reset-password/')
-  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
-    return this.authService.verifyForgetPasswordRequest(resetPasswordDto)
   }
 
   @UseGuards(JwtAuthGuard)

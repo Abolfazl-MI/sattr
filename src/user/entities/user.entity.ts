@@ -47,7 +47,7 @@ export class UserEntity {
   @JoinColumn()
   listenTime: ListenTimeEntity;
 
-  @OneToOne(() => UserMetaEntity, (meta) => meta.user, { onDelete: 'CASCADE' })
+  @OneToOne(() => UserMetaEntity, (meta) => meta.user, { onDelete: 'CASCADE' , cascade:true })
   @JoinColumn()
   userMeta: UserMetaEntity;
 

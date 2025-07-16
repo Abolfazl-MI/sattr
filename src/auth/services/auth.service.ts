@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  HttpException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -14,7 +15,7 @@ import { RegisterUserRequestDto } from '../../common/dto/registerUserRequestDto'
 
 import { generateOtpCode } from '../../common/utils/otp.gen';
 import { VerifyOtpRequestDto } from '../dto/verify-request.dto';
-import { RefreshTokenRequestDto } from '../dto/refreshTokenRequest.dto';
+import { RefreshTokenRequestDto } from '../dto/refresh-token-request.dto';
 import { JsonWebTokenError } from '@nestjs/jwt';
 import { LoginRequestDto } from '../dto/login-request.dto';
 import { ForgetPasswordRequest } from '../dto/forget-request.dto';
@@ -24,9 +25,11 @@ import {
 } from 'src/common/dtos/single-id-validator';
 import { JwtPayload } from 'src/common/interfaces/jwt.payload';
 import { OtpService } from './otp.service';
-import { comparePassword } from 'src/common/utils/bcrypt';
-import { hashPhone } from 'src/common/utils/crypto';
+import { comparePassword, encodePassword } from 'src/common/utils/bcrypt';
+import { hashData } from 'src/common/utils/crypto';
 import { ResetPasswordDto } from '../dto/reset-password.dto';
+import { v4 as uuid } from 'uuid';
+import { UserDataAccess } from 'src/user/user.data-access.service';
 
 @Injectable()
 export class AuthService {
@@ -34,6 +37,7 @@ export class AuthService {
     @Inject(CACHE_MANAGER) private cache: Cache,
     private readonly jwtTokenService: JwtTokenService,
     private readonly userService: UserService,
+    private readonly userDataAccessService: UserDataAccess,
     private readonly otpService: OtpService,
   ) {}
 
@@ -58,7 +62,6 @@ export class AuthService {
 
     const user = await this.userService.registerUser({
       phone: request.phone,
-      password: request.password,
     });
 
     const { accessToken, refreshToken } =
@@ -80,70 +83,6 @@ export class AuthService {
         refreshToken,
       },
     };
-  }
-
-  async sendEmailVerificationLink({ id }: SingleIdValidator) {
-    const user = await this.userService.findUserById(id);
-    if (!user) throw new UnauthorizedException('user not found');
-    if (user.isEmailVerified) {
-      return {
-        message: 'Already Verified',
-      };
-    }
-    const token = await this.jwtTokenService.generateForgetToken(user.id);
-    const hasRequestBefore = await this.cache.get(
-      `${this.EMAIL_VERIFY_KEY}${user.email}`,
-    );
-    if (hasRequestBefore)
-      throw new BadRequestException('Verification already sent');
-
-    await this.cache.set(
-      `${this.EMAIL_VERIFY_KEY}${user.email}`,
-      token,
-      2 * 60 * 1000,
-    );
-
-    let url =
-      process.env.NODE_ENV === 'development'
-        ? `http://localhost:${process.env.PORT || 3000}/verify-email/${token}`
-        : `${process.env.BASE_URL}/verify-email/${token}`;
-
-    // todo send email
-
-    return {
-      message: 'verification link sent',
-      ...(process.env.NODE_ENV === 'development' && { url, token }),
-    };
-  }
-
-  async verifyEmail({ id }: SingleIdValidator, param: RequiredParamValidator) {
-    const { param: token } = param;
-
-    const user = await this.userService.findUserById(id);
-
-    const key = `${this.EMAIL_VERIFY_KEY}${user.email}`;
-    const storedToken = await this.cache.get(key);
-
-    if (!storedToken) throw new BadRequestException('Invalid or Expired link');
-
-    try {
-      const { sub }: JwtPayload =
-        await this.jwtTokenService.verifyForgetToken(token);
-      await this.cache.del(key);
-      if (sub === user.id) {
-        await this.userService.verifyUserEmail(user.id);
-        return {
-          message: 'verified',
-        };
-      } else {
-        throw new BadRequestException('Invalid or Expired link');
-      }
-    } catch (error) {
-      if (error instanceof JsonWebTokenError)
-        throw new BadRequestException('Invalid or Expired link');
-
-      throw new InternalServerErrorException();
-    }
   }
 
   async refreshToken(
@@ -186,10 +125,8 @@ export class AuthService {
   }
 
   async login({ phone, email, password }: LoginRequestDto) {
-    //
-    // 0919
     const user = await this.userService.findUser({
-      where: [{ phone }, { email }],
+      where: [{ phone }, { email, isEmailVerified: true }],
     });
 
     if (!user) throw new BadRequestException('Username or password is wrong');
@@ -228,8 +165,9 @@ export class AuthService {
       throw new NotFoundException('User with provided information not found');
 
     // check if previously requested
-    const bcryptPhone = hashPhone(phone);
+    const bcryptPhone = hashData(phone);
     const key = `${this.FORGET_PREFIX}${bcryptPhone}`;
+
     const hasRequested = await this.cache.get(key);
     if (hasRequested)
       throw new BadRequestException('Multiple Forget Request Not allowed');
@@ -237,6 +175,8 @@ export class AuthService {
     const otpCode = generateOtpCode(4);
 
     await this.cache.set(key, otpCode, 15 * 60 * 1000);
+
+    // Send code with OTP provider
 
     return {
       message: 'Verification code sended!',
@@ -246,13 +186,13 @@ export class AuthService {
 
   // Use phone crypto instead ipAddress
   //
-  async verifyForgetPasswordRequest({ code, phone }: ResetPasswordDto) {
-    const bcryptPhone = hashPhone(phone);
+  async resetPassword({ code, phone, password }: ResetPasswordDto) {
+    const bcryptPhone = hashData(phone);
     const key = `${this.FORGET_PREFIX}${bcryptPhone}`;
 
     const getCode = await this.cache.get(key);
     if (!getCode || getCode !== code)
-      throw new UnauthorizedException('Invalid code');
+      throw new BadRequestException('Invalid code');
 
     try {
       const user = await this.userService.findUser({
@@ -261,18 +201,67 @@ export class AuthService {
         },
       });
       if (!user) throw new UnauthorizedException('UnAuthorized request');
-      const accessToken = await this.jwtTokenService.generateAccessToken(
-        user.id,
-      );
-      return {
-        accessToken,
-        message: 'this token last only 5min, change your password by update',
-      };
-    } catch (error) {
-      if (error instanceof JsonWebTokenError)
-        throw new BadRequestException('Refresh token expired');
 
-      throw new InternalServerErrorException('');
+      user.password = encodePassword(password);
+      await this.userDataAccessService.updateUser(user);
+
+      await this.cache.del(key);
+
+      return { message: 'User password updated successfully' };
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+
+      throw new InternalServerErrorException();
     }
+  }
+
+  async sendEmailVerificationLink({ id }: SingleIdValidator) {
+    const user = await this.userService.findUser({
+      where: {
+        id,
+      },
+    });
+
+    if (!user) throw new UnauthorizedException('User not found');
+    if (!user.email) throw new BadRequestException('Email not provided');
+
+    if (user.isEmailVerified) {
+      return {
+        message: 'Already Verified',
+      };
+    }
+
+    const token = uuid();
+    await this.cache.set(
+      `${this.EMAIL_VERIFY_KEY}${token}`,
+      user.email,
+      2 * 60 * 1000,
+    );
+
+    let url =
+      process.env.NODE_ENV === 'development'
+        ? `http://localhost:${process.env.PORT || 3000}/verify-email/${token}`
+        : `${process.env.BASE_URL}/verify-email/${token}`;
+
+    // todo send email
+
+    return {
+      message: 'verification link sent',
+      ...(process.env.NODE_ENV === 'development' && { url, token }),
+    };
+  }
+
+  async verifyEmail(
+    { id }: SingleIdValidator,
+    { param }: RequiredParamValidator,
+  ) {
+    const key = `${this.EMAIL_VERIFY_KEY}${param}`;
+    const email: string | undefined = await this.cache.get(key);
+
+    if (!email) throw new BadRequestException('Invalid or Expired link');
+
+    await this.userService.verifyUserEmail(id, email);
+
+    return { message: 'Email verified' };
   }
 }

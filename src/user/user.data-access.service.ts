@@ -28,6 +28,10 @@ export class UserDataAccess {
     return this.userMetaRepository.exists(options);
   }
 
+  updateUser(options: Partial<UserEntity>) {
+    return this.userRepository.update({ id: options.id }, options);
+  }
+
   updateUserMeta(userMeta: Partial<UserMetaEntity>) {
     return this.userMetaRepository.save(userMeta);
   }
