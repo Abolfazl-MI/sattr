@@ -8,7 +8,8 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { BookEntity } from './book.entity';
-import { UserFavoriteEntity } from 'src/user/entity/user.favorites';
+import { UserFavoriteEntity } from 'src/user/entities/user.favorites';
+
 
 @Entity('episode')
 export class EpisodeEntity {

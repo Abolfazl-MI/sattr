@@ -5,20 +5,29 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user.entity';
 import { ListenTimeEntity } from './entities/listenTime.entity';
 import { UserMetaEntity } from './entities/userMeta.entity';
-import { UserDataAcess } from './services/user.dataAcess.service';
+
 import { BookModule } from 'src/book/book.module';
-import { UserFavoriteEntity } from './entity/user.favorites';
-import { UserFavoriteDataAcess } from './services/user.favorites.dataAcess';
-import { UserDataAccess } from './user.data-access.service';
+
+import { UserFavoriteDataAcess as UserFavoriteDataAccess } from './services/user.favorites.dataAcess';
+import { UserFavoriteEntity } from './entities/user.favorites';
+import { UserDataAccess } from './services/user.dataAcess.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UserEntity, ListenTimeEntity, UserMetaEntity, UserFavoriteEntity]),
+    TypeOrmModule.forFeature([
+      UserEntity,
+      ListenTimeEntity,
+      UserMetaEntity,
+      UserFavoriteEntity,
+    ]),
     BookModule,
-
   ],
   controllers: [UserController],
-  providers: [UserService, UserDataAcess, UserFavoriteDataAcess ,UserDataAccess],
-  exports: [UserService, UserDataAcess, UserFavoriteDataAcess , UserDataAccess],
+  providers: [
+    UserService,
+    UserDataAccess,
+    UserFavoriteDataAccess,
+  ],
+  exports: [UserService, UserDataAccess, UserFavoriteDataAccess, UserDataAccess],
 })
 export class UserModule { }

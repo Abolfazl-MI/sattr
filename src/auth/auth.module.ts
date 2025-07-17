@@ -4,19 +4,18 @@ import { AuthController } from './auth.controller';
 import { JwtTokenService } from './services/jwt.service';
 import { UserModule } from '../user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserEntity } from '../user/entity/user.entity';
-import { ListenTimeEntity } from '../user/entity/listenTime.entity';
-import { UserMetaEntity } from '../user/entity/userMeta.entity';
-import { UserService } from '../user/services/user.service';
+
+
 import { UserEntity } from '../user/entities/user.entity';
-import { ListenTimeEntity } from '../user/entities/listenTime.entity';
-import { UserMetaEntity } from '../user/entities/userMeta.entity';
+
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { OtpService } from './services/otp.service';
+import { ListenTimeEntity } from 'src/user/entities/listenTime.entity';
+import { UserMetaEntity } from 'src/user/entities/userMeta.entity';
 
 @Module({
   imports: [
-    UserModule,
+      UserModule,
     TypeOrmModule.forFeature([UserEntity, ListenTimeEntity, UserMetaEntity]),
     JwtModule.register({
       secret: process.env.JWT_SECRET,

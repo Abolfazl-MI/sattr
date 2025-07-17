@@ -28,7 +28,7 @@ import { FeedModule } from './feed/feed.module';
 import { SectionEntity } from './feed/entities/section.entity';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'node:path';
-import { UserFavoriteEntity } from './user/entity/user.favorites';
+
 @Module({
   imports: [
     ServeStaticModule.forRoot({

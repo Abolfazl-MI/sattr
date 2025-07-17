@@ -7,10 +7,10 @@ import { BookDataAccess } from "src/book/services/book.data-access.service";
 import { Repository } from "typeorm";
 
 
-import { UserFavoriteEntity } from "../entity/user.favorites";
 
 import { ListFavoriteItemsDto, UserFavoriteRequestDto } from "../dtos/userFavorite.request.dto";
 import { EpisodeDataAccess } from "src/book/episode-dataAcess.service";
+import { UserFavoriteEntity } from "../entities/user.favorites";
 
 @Injectable()
 export class UserFavoriteDataAcess {
@@ -31,7 +31,9 @@ export class UserFavoriteDataAcess {
                 }
             }
         })
-        const book = await this.bookDataAcess.findOneById(entityId)
+        const book = await this.bookDataAcess.findOneById({
+            id: entityId
+        })
         if (!book) throw new NotFoundException()
 
         if (!userFavorite) {
@@ -52,7 +54,7 @@ export class UserFavoriteDataAcess {
         }
     }
     async removeBookFromFavorites(request: UserFavoriteRequestDto) {
-        const { entityId, userId } = request
+        const { entityId: id, userId } = request
         const userFavorite = await this.repository.findOne({
             where: {
                 isActive: true,
@@ -61,7 +63,9 @@ export class UserFavoriteDataAcess {
                 }
             }
         })
-        const book = await this.bookDataAcess.findOneById(entityId)
+        const book = await this.bookDataAcess.findOneById({
+            id
+        })
         if (!book || !userFavorite) throw new NotFoundException()
 
         await this.repository
@@ -74,7 +78,7 @@ export class UserFavoriteDataAcess {
         }
     }
     async addEpisodeToUserFavorite(request: UserFavoriteRequestDto) {
-        const { entityId, userId } = request
+        const { entityId: id, userId } = request
         let userFavorite = await this.repository.findOne({
             where: {
                 isActive: true,
@@ -83,9 +87,13 @@ export class UserFavoriteDataAcess {
                 }
             }
         })
-        const episode = await this.bookDataAcess.findOneEpisode(entityId)
+        const episode = await this.bookDataAcess.findOneEpisode({
+            where: {
+                id
+            }
+        })
         if (!episode) throw new NotFoundException()
-            
+
         if (!userFavorite) {
             userFavorite = this.repository.create({
                 user: { id: userId },
@@ -103,7 +111,7 @@ export class UserFavoriteDataAcess {
         }
     }
     async removeEpisodeFromUserFavorite(request: UserFavoriteRequestDto) {
-        const { entityId, userId } = request
+        const { entityId: id, userId } = request
         const userFavorite = await this.repository.findOne({
             where: {
                 isActive: true,
@@ -112,7 +120,11 @@ export class UserFavoriteDataAcess {
                 }
             }
         })
-        const episode = await this.bookDataAcess.findOneEpisode(entityId)
+        const episode = await this.bookDataAcess.findOneEpisode({
+            where: {
+                id
+            }
+        })
         if (!episode || !userFavorite) throw new NotFoundException()
 
         await this.repository

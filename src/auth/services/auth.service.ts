@@ -10,7 +10,6 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { Inject } from '@nestjs/common';
 import { JwtTokenService } from './jwt.service';
-import { UserService } from '../../user/user.service';
 import { RegisterUserRequestDto } from '../../common/dto/registerUserRequestDto';
 
 import { generateOtpCode } from '../../common/utils/otp.gen';
@@ -29,7 +28,9 @@ import { comparePassword, encodePassword } from 'src/common/utils/bcrypt';
 import { hashData } from 'src/common/utils/crypto';
 import { ResetPasswordDto } from '../dto/reset-password.dto';
 import { v4 as uuid } from 'uuid';
-import { UserDataAccess } from 'src/user/user.data-access.service';
+
+import { UserService } from 'src/user/services/user.service';
+import { UserDataAccess } from 'src/user/services/user.dataAcess.service';
 
 @Injectable()
 export class AuthService {

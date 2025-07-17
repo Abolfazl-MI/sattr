@@ -5,13 +5,14 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { UserDataAccess } from 'src/user/user.data-access.service';
+
 import { BookDataAccess } from '../services/book.data-access.service';
 import { MoreThan } from 'typeorm';
 import { plainToInstance } from 'class-transformer';
 import { SingleIdValidator } from 'src/common/dtos/single-id-validator';
 import { validateSync } from 'class-validator';
 import { BookEntity } from '../entities/book.entity';
+import { UserDataAccess } from 'src/user/services/user.dataAcess.service';
 
 @Injectable()
 export class AccessEpisodeGuard implements CanActivate {
@@ -46,7 +47,7 @@ export class AccessEpisodeGuard implements CanActivate {
       }
 
       if (book?.isIndividual) {
-        const userMeta = await this.userDataAccess.exists({
+        const userMeta = await this.userDataAccess.userMetaExists({
           where: {
             user: { id: userId },
             books: {
@@ -57,7 +58,7 @@ export class AccessEpisodeGuard implements CanActivate {
 
         if (userMeta) return true;
       } else {
-        const userMeta = await this.userDataAccess.exists({
+        const userMeta = await this.userDataAccess.userMetaExists({
           where: {
             user: { id: userId },
             subscriptionExpiresAt: MoreThan(new Date()),
