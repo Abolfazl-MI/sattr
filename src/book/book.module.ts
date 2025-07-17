@@ -6,12 +6,16 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { EpisodeEntity } from './entities/episode.entity';
 import { BookService } from './services/book.service';
 import { BookDataAccess } from './services/book.data-access.service';
-import { AuthModule } from 'src/auth/auth.module';
+import { UserModule } from 'src/user/user.module';
 
 @Module({
-  imports:[TypeOrmModule.forFeature([BookEntity , CategoryEntity , EpisodeEntity])],
+  imports: [
+    TypeOrmModule.forFeature([BookEntity, CategoryEntity, EpisodeEntity]),
+    UserModule,
+    BookModule
+  ],
   controllers: [BookController],
-  providers: [BookService , BookDataAccess],
-  exports:[BookDataAccess]
+  providers: [BookService, BookDataAccess],
+  exports: [BookDataAccess],
 })
 export class BookModule {}

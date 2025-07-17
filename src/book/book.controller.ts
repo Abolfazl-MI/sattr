@@ -1,9 +1,18 @@
-import { Body, Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { BookService } from './services/book.service';
 import { SingleIdValidator } from 'src/common/dtos/single-id-validator';
 import { SearchBookDto } from './dtos/search-book.dto';
 import { JwtAuthGuard } from 'src/common/guards/jwt.auth.guard';
 import { ApiBody, ApiParam } from '@nestjs/swagger';
+import { AccessEpisodeGuard } from './guards/access-episode.guard';
 
 //? TODO -> Authorize user with guard before access routes
 @Controller('books')
@@ -20,7 +29,6 @@ export class BookController {
       required: ['name']
     }
   })
-  //? TODO Pagination
   @Post('search')
   searchBooks(@Body() searchBlogDto: SearchBookDto) {
     return this.bookService.searchBooks(searchBlogDto.name);
@@ -32,15 +40,14 @@ export class BookController {
     format: 'uuid',
     example: '8d18a3b8-2b4e-4b8c-93a4-dde9dc84c1e0',
   })
-  //? TODO Guard 
-  @UseGuards(JwtAuthGuard)
-  @Get('episodes/:id')
+  @UseGuards(JwtAuthGuard, AccessEpisodeGuard)
+  @Get('episodes/:bookId')
   getBookEpisodes(
-    @Param() { id }: SingleIdValidator,
+    @Param() { bookId }: { bookId: string },
     @Query('skip') skip: number,
     @Query('take') take: number,
   ) {
-    return this.bookService.getBookEpisodes(id, skip, take);
+    return this.bookService.getBookEpisodes(bookId, skip, take);
   }
   @ApiParam({
     name: 'id',
@@ -49,9 +56,10 @@ export class BookController {
     format: 'uuid',
     example: '8d18a3b8-2b4e-4b8c-93a4-dde9dc84c1e0',
   })
-  @Get('episode/:id')
-  getEpisode(@Param() { id }: SingleIdValidator) {
-    return this.bookService.getEpisode(id);
+  @UseGuards(JwtAuthGuard, AccessEpisodeGuard)
+  @Get('episode/:episodeId')
+  getEpisode(@Param() { episodeId }: { episodeId: string }) {
+    return this.bookService.getEpisode(episodeId);
   }
   @ApiParam({
     name: 'id',
