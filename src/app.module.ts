@@ -10,7 +10,7 @@ import { AuthModule } from './auth/auth.module';
 import * as process from 'node:process';
 import { createKeyv, Keyv } from '@keyv/redis';
 import { CacheableMemory } from 'cacheable';
-import { RedisOptions } from './common/utills/redis.config';
+import { RedisOptions } from './common/utils/redis.config';
 import { UserEntity } from './user/entities/user.entity';
 import { ListenTimeEntity } from './user/entities/listenTime.entity';
 import { UserMetaEntity } from './user/entities/userMeta.entity';
@@ -26,8 +26,15 @@ import { CouponModule } from './coupon/coupon.module';
 import { CouponEntity } from './coupon/entities/coupon.entity';
 import { FeedModule } from './feed/feed.module';
 import { SectionEntity } from './feed/entities/section.entity';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'node:path';
+
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(process.cwd(), 'public'),
+      serveRoot: '/public', // or just '/' if you want
+    }),
     ConfigModule.forRoot(),
     CacheModule.registerAsync(RedisOptions),
     TypeOrmModule.forRoot({

@@ -8,7 +8,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { BookDataAccess } from 'src/book/services/book.data-access.service';
-import { UserDataAccess } from 'src/user/user.data-access.service';
+
 import { MoreThan, Repository } from 'typeorm';
 import { BuyProductDto } from './dtos/buy-product.dto';
 import { v4 as uuid } from 'uuid';
@@ -21,6 +21,7 @@ import { BookEntity } from 'src/book/entities/book.entity';
 import { PlanEntity } from 'src/plan/entities/plan.entity';
 import { Status } from './enums/status.enum';
 import { UserEntity } from 'src/user/entities/user.entity';
+import { UserDataAccess } from 'src/user/services/user.dataAcess.service';
 
 @Injectable()
 export class TransactionService {
@@ -48,14 +49,15 @@ export class TransactionService {
       let productAmount = 0;
 
       if (purchaseType === PurchaseType.INDIVIDUAL) {
-        book = await this.bookDataAccess.findOneById(productId, {
+        book = await this.bookDataAccess.findOneById({
+          id: productId,
           price: MoreThan(0),
           isIndividual: true,
         });
 
         if (!book) throw new NotFoundException('Product not found!');
 
-        const alreadyPurchase = await this.userDataAccess.exists({
+        const alreadyPurchase = await this.userDataAccess.userMetaExists({
           where: {
             user: { id: userId },
             books: { id: book.id },

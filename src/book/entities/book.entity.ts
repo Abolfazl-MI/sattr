@@ -14,6 +14,8 @@ import { CategoryEntity } from './category.entitiy';
 import { EpisodeEntity } from './episode.entity';
 import { UserMetaEntity } from 'src/user/entities/userMeta.entity';
 import { SectionEntity } from 'src/feed/entities/section.entity';
+import { UserFavoriteEntity } from 'src/user/entities/user.favorites';
+
 
 @Entity('book')
 export class BookEntity {
@@ -70,4 +72,7 @@ export class BookEntity {
 
   @ManyToMany(() => SectionEntity, section => section.books)
   sections: SectionEntity[];
+
+  @ManyToMany(() => UserFavoriteEntity, userFav => userFav.favoritedBooks)
+  favortedBooks: BookEntity[]
 }
