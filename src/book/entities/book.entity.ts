@@ -2,6 +2,8 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinTable,
+
   ManyToMany,
   ManyToOne,
   OneToMany,
@@ -10,6 +12,7 @@ import {
 } from 'typeorm';
 import { CategoryEntity } from './category.entitiy';
 import { EpisodeEntity } from './episode.entity';
+import { UserMetaEntity } from 'src/user/entities/userMeta.entity';
 import { SectionEntity } from 'src/feed/entities/section.entity';
 import { UserFavoriteEntity } from 'src/user/entity/user.favorites';
 
@@ -55,6 +58,10 @@ export class BookEntity {
 
   @OneToMany(() => EpisodeEntity, (episode) => episode.book)
   episodes: EpisodeEntity[];
+
+  @ManyToMany(() => UserMetaEntity, (userMeta) => userMeta.books)
+  @JoinTable()
+  users: UserMetaEntity;
 
   @CreateDateColumn()
   createdAt: Date;

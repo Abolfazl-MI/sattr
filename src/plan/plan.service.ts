@@ -1,16 +1,16 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { PlanEntity } from './entity/plan.entity';
+import { PlanEntity } from './entities/plan.entity';
 import { Repository } from 'typeorm';
 import { ListRequestDto } from 'src/common/dtos/listRequestDto.dto';
-import { PlanDataAcess } from './plan.dataAccess.service';
+import { PlanDataAccess } from './plan.dataAccess.service';
 
 
 @Injectable()
 export class PlanService {
 
     constructor(
-        private readonly planDataAcess: PlanDataAcess
+        private readonly planDataAcess: PlanDataAccess
     ) { }
 
     async getAllPlans(request: ListRequestDto) {

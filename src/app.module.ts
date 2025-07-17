@@ -10,16 +10,20 @@ import { AuthModule } from './auth/auth.module';
 import * as process from 'node:process';
 import { createKeyv, Keyv } from '@keyv/redis';
 import { CacheableMemory } from 'cacheable';
-import { RedisOptions } from './common/utills/redis.config';
-import { UserEntity } from './user/entity/user.entity';
-import { ListenTimeEntity } from './user/entity/listenTime.entity';
-import { UserMetaEntity } from './user/entity/userMeta.entity';
+import { RedisOptions } from './common/utils/redis.config';
+import { UserEntity } from './user/entities/user.entity';
+import { ListenTimeEntity } from './user/entities/listenTime.entity';
+import { UserMetaEntity } from './user/entities/userMeta.entity';
 import { BookModule } from './book/book.module';
 import { CategoryEntity } from './book/entities/category.entitiy';
 import { BookEntity } from './book/entities/book.entity';
 import { EpisodeEntity } from './book/entities/episode.entity';
+import { TransactionModule } from './transaction/transaction.module';
+import { TransactionEntity } from './transaction/entities/transaction.entity';
 import { PlanModule } from './plan/plan.module';
-import { PlanEntity } from './plan/entity/plan.entity';
+import { PlanEntity } from './plan/entities/plan.entity';
+import { CouponModule } from './coupon/coupon.module';
+import { CouponEntity } from './coupon/entities/coupon.entity';
 import { FeedModule } from './feed/feed.module';
 import { SectionEntity } from './feed/entities/section.entity';
 import { ServeStaticModule } from '@nestjs/serve-static';
@@ -40,24 +44,28 @@ import { UserFavoriteEntity } from './user/entity/user.favorites';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
-      entities: [
-        UserEntity,
-        ListenTimeEntity,
-        UserMetaEntity,
-        BookEntity,
-        CategoryEntity,
-        EpisodeEntity,
-        PlanEntity,
-        SectionEntity,
-        UserFavoriteEntity
-      ],
-      logging: true,
+      // entities: [
+      //   UserEntity,
+      //   ListenTimeEntity,
+      //   UserMetaEntity,
+      //   BookEntity,
+      //   CategoryEntity,
+      //   EpisodeEntity,
+      //   TransactionEntity,
+      //   PlanEntity,
+      //   CouponEntity,,
+      //   SectionEntity
+      // ],
+      autoLoadEntities:true,
+      logging:true,
       synchronize: true,
     }),
     UserModule,
     AuthModule,
     BookModule,
+    TransactionModule,
     PlanModule,
+    CouponModule,
     FeedModule,
   ],
   controllers: [AppController],

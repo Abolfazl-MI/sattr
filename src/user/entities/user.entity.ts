@@ -11,6 +11,7 @@ import {
 import { ListenTimeEntity } from './listenTime.entity';
 import { UserMetaEntity } from './userMeta.entity';
 import { UserFavoriteEntity } from './user.favorites';
+import { Exclude } from 'class-transformer';
 
 export enum UserRole {
   ADMIN = 'ADMIN',
@@ -37,6 +38,13 @@ export class UserEntity {
   @Column({ default: true })
   isActive: boolean;
 
+  @Exclude()
+  @Column({ nullable: true })
+  password: string;
+
+  @Column({ default: false })
+  isEmailVerified: boolean;
+
   @Column({ default: UserRole.USER, enum: UserRole, type: 'enum' })
   role: UserRole;
 
@@ -44,7 +52,8 @@ export class UserEntity {
   @JoinColumn()
   listenTime: ListenTimeEntity;
 
-  @OneToOne(() => UserMetaEntity, { onDelete: 'CASCADE' })
+  @OneToOne(() => UserMetaEntity, (meta) => meta.user, { onDelete: 'CASCADE' , cascade:true })
+  @JoinColumn()
   userMeta: UserMetaEntity;
 
   @CreateDateColumn()

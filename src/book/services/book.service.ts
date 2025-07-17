@@ -1,4 +1,4 @@
-import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { BookDataAccess } from './book.data-access.service';
 
 @Injectable()
@@ -6,7 +6,7 @@ export class BookService {
   constructor(private readonly dataAccess: BookDataAccess) {}
 
   async getBookById(id: string) {
-    const book = await this.dataAccess.findOneById(id);
+    const book = await this.dataAccess.findOneById({ id });
     if (!book) throw new NotFoundException('Book not found!');
 
     return book;
@@ -23,7 +23,7 @@ export class BookService {
   }
 
   async getEpisode(id: string) {
-    const episode = await this.dataAccess.findOneEpisode(id);
+    const episode = await this.dataAccess.findOneEpisode({ where: { id } });
 
     if (!episode) throw new NotFoundException('Episode not found!');
 
@@ -42,6 +42,6 @@ export class BookService {
 
     if (!result) throw new NotFoundException('Category not found!');
 
-    return result
+    return result;
   }
 }
