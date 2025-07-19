@@ -6,20 +6,21 @@ export const RedisOptions: CacheModuleAsyncOptions = {
   imports: [ConfigModule],
   isGlobal: true,
   useFactory: async (configService: ConfigService) => {
-    console.log('trying to connect redis')
+    console.log('trying to connect redis');
     console.log({
       host: process.env.REDIS_HOST,
-      port: process.env.REDIS_PORT
-    })
+      port: process.env.REDIS_PORT,
+    });
+
     const store = await redisStore({
       socket: {
         host: process.env.REDIS_HOST,
-        port: process.env.REDIS_PORT
+        port: Number(process.env.REDIS_PORT),
       },
     });
-    return {
-      store: () => store,
 
+    return {
+      store,
     };
   },
   inject: [ConfigService],
