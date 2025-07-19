@@ -26,6 +26,7 @@ import {
 } from './dtos/userFavorite.request.dto';
 import { ListRequestDto } from 'src/common/dtos/listRequestDto.dto';
 import { multerOptions } from 'src/common/utils/upload.config';
+import { UserSwagger } from './decorators/user-swagger.decorator';
 
 @Controller('user')
 export class UserController {
@@ -33,6 +34,7 @@ export class UserController {
 
   @UseGuards(JwtAuthGuard)
   @Get('/profile')
+  @UserSwagger.GetProfile()
   async getUserProfiel(@Req() request: Express.Request) {
     console.log(request.user);
     return this.userService.getUserProfile({ id: request.user.id });
@@ -41,6 +43,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Put('/profile')
   @UseInterceptors(FileInterceptor('profile', multerOptions))
+  @UserSwagger.UpdateProfile()
   async updateUserProfiel(
     @Req() request: Express.Request,
     @UploadedFile() file: Express.Multer.File,
@@ -61,6 +64,7 @@ export class UserController {
 
   @UseGuards(JwtAuthGuard)
   @Get('/favorites')
+  @UserSwagger.GetFavorites()
   async getUserFavorites(
     @Req() { user }: Express.Request,
     @Query() query: GetFavoritesQueryDto,
