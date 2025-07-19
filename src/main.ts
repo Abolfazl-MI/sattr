@@ -5,7 +5,9 @@ import * as bcrypt from 'bcrypt';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    cors: true
+  });
 
   app.setGlobalPrefix('/api/v1');
 
@@ -15,7 +17,7 @@ async function bootstrap() {
     transform: true,
   }));
   const password = await bcrypt.hash('aA1383@@', 12)
-  console.log(password)  
+  console.log(password)
   const swaggerConfig = new DocumentBuilder().setTitle('Satr').setDescription('Swagger documentation for Satr project').setVersion('1.0').build()
   const docFactory = () => SwaggerModule.createDocument(app, swaggerConfig, { autoTagControllers: true, deepScanRoutes: true }
   )
