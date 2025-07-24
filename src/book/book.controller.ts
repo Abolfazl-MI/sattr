@@ -2,9 +2,12 @@ import {
   Body,
   Controller,
   Get,
+  Header,
+  Headers,
   Param,
   Post,
   Query,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import { BookService } from './services/book.service';
@@ -13,21 +16,22 @@ import { SearchBookDto } from './dtos/search-book.dto';
 import { JwtAuthGuard } from 'src/common/guards/jwt.auth.guard';
 import { ApiBody, ApiParam } from '@nestjs/swagger';
 import { AccessEpisodeGuard } from './guards/access-episode.guard';
+import { Response } from 'express';
 
 //? TODO -> Authorize user with guard before access routes
 @Controller('books')
 export class BookController {
-  constructor(private readonly bookService: BookService) { }
+  constructor(private readonly bookService: BookService) {}
   @ApiBody({
     schema: {
       type: 'object',
       properties: {
         name: {
           type: 'string',
-        }
+        },
       },
-      required: ['name']
-    }
+      required: ['name'],
+    },
   })
   @Post('search')
   searchBooks(@Body() searchBlogDto: SearchBookDto) {
@@ -61,6 +65,19 @@ export class BookController {
   getEpisode(@Param() { episodeId }: { episodeId: string }) {
     return this.bookService.getEpisode(episodeId);
   }
+
+  @Get('/stream/:episodeId')
+  @UseGuards(JwtAuthGuard, AccessEpisodeGuard)
+  @Header('Accept-Ranges', 'bytes')
+  @Header('Content-Type', 'audio/mp3')
+  async streamEpisode(
+    @Param('episodeId') id: string,
+    @Headers() headers: Record<string, string>,
+    @Res() res: Response,
+  ) {
+    return this.bookService.streamAudioFile(id, headers.range, res);
+  }
+
   @ApiParam({
     name: 'id',
     required: true,

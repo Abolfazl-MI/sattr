@@ -132,6 +132,8 @@ export class TransactionService {
         },
       });
 
+      console.log(transaction)
+
       if (!transaction) throw new NotFoundException('Transaction not found!');
 
       //! Request to payment provider to verify payment
@@ -159,6 +161,8 @@ export class TransactionService {
       if (transaction.couponId) {
         await this.couponService.decreaseCouponCapacity(transaction.couponId);
       }
+
+      console.log('Testi')
 
       await this.transactionEntity.update(
         { id: transaction.id },
