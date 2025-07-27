@@ -93,7 +93,7 @@ export class UserDataAccess {
     }
 
     async updateUserMeta(userMeta: Partial<UserMetaEntity>) {
-        return this.repository.save(userMeta);
+        return this.userMetaRepository.save(userMeta);
     }
     async exists(options: FindOneOptions<UserEntity>) {
         return this.repository.exists(options)
